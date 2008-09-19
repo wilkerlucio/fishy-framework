@@ -1,6 +1,6 @@
 <?php
 
-class Fishy_Controller
+abstract class Fishy_Controller
 {
 	protected $_data;
 	protected $_render;
@@ -24,6 +24,11 @@ class Fishy_Controller
 		return strtolower(substr(get_class($this), 0, -strlen('Controller')));
 	}
 	
+	protected function viewpath($method)
+	{
+		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', $this->classname()) . '/' . $method . '.php';
+	}
+	
 	/**
 	 * Execute main routine of an action
 	 *
@@ -33,7 +38,7 @@ class Fishy_Controller
 	 */
 	public function execute($method, $args = array())
 	{
-		$view_path = FISHY_VIEWS_PATH . '/' . $this->classname() . '/' . $method . '.php';
+		$view_path = $this->viewpath($method);
 		
 		if (!method_exists($this, $method) && !file_exists($view_path)) {
 			throw new Exception("Not found $method in " . $this->classname());
@@ -73,7 +78,7 @@ class Fishy_Controller
 	{
 		ob_start();
 		
-		$view_path = FISHY_VIEWS_PATH . '/' . $this->classname() . '/' . $action . '.php';
+		$view_path = $this->viewpath($action);
 		
 		if (file_exists($view_path)) {
 			include $view_path;
@@ -97,6 +102,103 @@ class Fishy_Controller
 		} else {
 			echo $output;
 		}
+	}
+	
+	/**
+	 * Renderize a partial template
+	 *
+	 * @param $partial The name o partial template
+	 * @param $data The data to send to partial template
+	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
+	 * @return mixed
+	 */
+	public function render_partial($partial, $data = null, $return = false)
+	{
+		ob_start();
+		
+		$view_path = $this->viewpath("_$partial");
+		
+		if (file_exists($view_path)) {
+			include $view_path;
+		}
+		
+		$output = ob_get_clean();
+		
+		if ($return) {
+			return $output;
+		} else {
+			echo $output;
+		}
+	}
+	
+	/**
+	 * Renderize a collection into a partial template
+	 *
+	 * @param $partial The name o partial template
+	 * @param $collection The collection to send to partial template
+	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
+	 * @return mixed
+	 */
+	public function render_collection($partial, $collection, $return = false)
+	{
+		$output = array();
+		
+		foreach ($collection as $data) {
+			$output[] = $this->render_partial($partial, $data, true);
+		}
+		
+		$output = implode('', $output);
+		
+		if ($return) {
+			return $output;
+		} else {
+			echo $output;
+		}
+	}
+	
+	/**
+	 * Redirect current flow
+	 *
+	 * @param $path The path to be redirected, this path works like if you are using site_url() method
+	 * @return void
+	 */
+	public function redirect_to($path)
+	{
+		header('Location: ' . $this->site_url($path));
+		exit;
+	}
+	
+	/**
+	 * This function get the base URL of site
+	 *
+	 * @param $sulfix Sulfix to be append at end of file
+	 * @return string The final path
+	 */
+	public final function base_url($sulfix = '')
+	{
+		return FISHY_BASE_URL . $sulfix;
+	}
+	
+	/**
+	 * This function get one internal url of site
+	 *
+	 * @param $sulfix Sulfix to be append at end of file
+	 * @return string The final path
+	 */
+	public function site_url($sulfix = '')
+	{
+		return $this->base_url(FISHY_INDEX_PAGE . $sulfix);
+	}
+	
+	/**
+	 * This function get one public url of site
+	 *
+	 * @param $sulfix Sulfix to be append at end of file
+	 * @return string The final path
+	 */
+	public function public_url($sulfix = '')
+	{
+		return $this->base_url('public/' . $sulfix);
 	}
 	
 	/**

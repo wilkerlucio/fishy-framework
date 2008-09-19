@@ -54,6 +54,17 @@ function fishy_autoloader($classname)
 		}
 	}
 	
+	//try to load model
+	$path = FISHY_MODELS_PATH . '/' . $classname . '.php';
+	
+	if (file_exists($path)) {
+		require_once $path;
+		
+		if (class_exists($classname)) {
+			return true;
+		}
+	}
+	
 	//try user library
 	$path = FISHY_LIBRARIES_PATH . '/' . $classname . '.php';
 	

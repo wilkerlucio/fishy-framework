@@ -15,17 +15,32 @@ abstract class ActiveRelation
     
     protected $local_model;
     protected $foreign_model;
+    protected $options;
     
     public function __construct($local_model, $foreign_model, $options = array())
     {
         $this->local_model = $local_model;
         $this->foreign_model = ActiveRecord::model($foreign_model);
+        $this->options = $options;
         
         $this->_data = null;
     }
     
+    public function get_local_field()
+    {
+    	if (isset($this->options['local_field'])) {
+    		return $this->options['local_field'];
+    	}
+    	
+        return 'id';
+    }
+    
     public function get_foreign_field($model)
     {
+    	if (isset($this->options['foreign_field'])) {
+    		return $this->options['foreign_field'];
+    	}
+    	
         return strtolower(get_class($model)) . '_id';
     }
     

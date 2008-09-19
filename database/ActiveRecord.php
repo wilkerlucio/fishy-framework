@@ -709,7 +709,7 @@ abstract class ActiveRecord
 	 */
 	protected function has_one($model, $options = array())
 	{
-	    $this->_relations[$model] = new ActiveRelationOne($this, $model);
+	    $this->_relations[$model] = new ActiveRelationOne($this, $model, $options);
 	}
 	
 	/**
@@ -720,7 +720,7 @@ abstract class ActiveRecord
 	 */
 	protected function has_many($model, $options = array())
 	{
-	    $this->_relations[$model] = new ActiveRelationMany($this, Inflect::singularize($model));
+	    $this->_relations[$model] = new ActiveRelationMany($this, Inflect::singularize($model), $options);
 	}
 	
 	/**

@@ -11,4 +11,11 @@ class Fishy_Uri {
         
         return trim($querystring, '/');
     }
+    
+    public static function segment($n) {
+    	$string = self::get_querystring();
+    	$bits = explode('/', trim($string, '/'));
+    	
+    	return isset($bits[$n]) ? $bits[$n] : null;
+    }
 }
