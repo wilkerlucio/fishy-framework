@@ -11,11 +11,22 @@ function fishy_autoloader($classname)
 	
 	//check if is a core library
 	if (Fishy_StringHelper::starts_with($classname, FISHY_SYSTEM_CLASS_PREFIX)) {
-		$path = FISHY_SYSTEM_LIBRARIES_PATH . '/' . substr($classname, strlen(FISHY_SYSTEM_CLASS_PREFIX)) . '.php';
+		$filename = substr($classname, strlen(FISHY_SYSTEM_CLASS_PREFIX));
+		$path = FISHY_SYSTEM_LIBRARIES_PATH . '/' . $filename . '.php';
 		
 		if (file_exists($path)) {
 			require_once $path;
 			
+			if (class_exists($classname)) {
+				return true;
+			}
+		}
+		
+		$path = FISHY_SYSTEM_HELPERS_PATH . '/' . $filename . '.php';
+
+		if (file_exists($path)) {
+			require_once $path;
+
 			if (class_exists($classname)) {
 				return true;
 			}
