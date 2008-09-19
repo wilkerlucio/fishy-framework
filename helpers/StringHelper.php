@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This class provides some string util functions for strings and texts
+ *
+ * @author Wilker Lucio
+ */
 class Fishy_StringHelper
 {
 	/**
