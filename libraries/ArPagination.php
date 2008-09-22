@@ -120,9 +120,9 @@ class Fishy_ArPagination
 	 * @param $value The value of option (if you passed a string at first argument)
 	 * @return void
 	 */
-	public function set_config($data, $value = false)
+	public function set_config($data, $value = null)
 	{
-		if (is_array($data) && $value === false) {
+		if (is_array($data) && $value === null) {
 			$this->config = array_merge($this->config, $data);
 		} else {
 			$this->config[$data] = $value;

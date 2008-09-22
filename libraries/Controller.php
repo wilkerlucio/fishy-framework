@@ -19,14 +19,23 @@ abstract class Fishy_Controller
 	
 	protected function initialize() {}
 	
+	public static function build_view_path($controller, $action)
+	{
+		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', $controller) . '/' . $action . '.php';
+	}
+	
 	protected function classname()
 	{
 		return strtolower(substr(get_class($this), 0, -strlen('Controller')));
 	}
 	
-	protected function viewpath($method)
+	protected function view_path($action, $controller = null)
 	{
-		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', $this->classname()) . '/' . $method . '.php';
+		if ($controller === null) {
+			$controller = $this->classname();
+		}
+		
+		return self::build_view_path($controller, $action);
 	}
 	
 	/**
@@ -38,7 +47,7 @@ abstract class Fishy_Controller
 	 */
 	public function execute($method, $args = array())
 	{
-		$view_path = $this->viewpath($method);
+		$view_path = $this->view_path($method);
 		
 		if (!method_exists($this, $method) && !file_exists($view_path)) {
 			throw new Exception("Not found $method in " . $this->classname());
@@ -69,16 +78,26 @@ abstract class Fishy_Controller
 		$controller->execute($method, $args);
 	}
 	
+	protected function render_options()
+	{
+		return array(
+			'return' => false,
+			'controller' => $this->classname()
+		);
+	}
+	
 	/**
 	 * Render the view of an action
 	 *
 	 * @action The action to be rendered
 	 */
-	public function render($action, $return = false)
+	public function render($action, $options = array())
 	{
+		$options = array_merge($this->render_options(), $options);
+		
 		ob_start();
 		
-		$view_path = $this->viewpath($action);
+		$view_path = $this->view_path($action, $options['controller']);
 		
 		if (file_exists($view_path)) {
 			include $view_path;
@@ -97,7 +116,7 @@ abstract class Fishy_Controller
 		
 		$this->_render = false;
 
-		if ($return) {
+		if ($options['return']) {
 			return $output;
 		} else {
 			echo $output;
@@ -112,11 +131,13 @@ abstract class Fishy_Controller
 	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
 	 * @return mixed
 	 */
-	public function render_partial($partial, $data = null, $return = false)
+	public function render_partial($partial, $data = null, $options = array())
 	{
+		$options = array_merge($this->render_options(), $options);
+		
 		ob_start();
 		
-		$view_path = $this->viewpath("_$partial");
+		$view_path = $this->view_path("_$partial", $options['controller']);
 		
 		if (file_exists($view_path)) {
 			include $view_path;
@@ -124,7 +145,7 @@ abstract class Fishy_Controller
 		
 		$output = ob_get_clean();
 		
-		if ($return) {
+		if ($options['return']) {
 			return $output;
 		} else {
 			echo $output;
