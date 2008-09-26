@@ -1,5 +1,7 @@
 <?php
 
+//TODO: cache behaviour
+
 //set some system definitios
 define('FISHY_SYSTEM_CLASS_PREFIX', 'Fishy_');
 
