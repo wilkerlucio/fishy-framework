@@ -16,12 +16,12 @@ class ActiveRelationMany extends ActiveRelation
 			$rel_table = $this->options['through'];
 			$foreign_table = $this->foreign_model->table();
 			$local_field = $this->get_local_field();
-			$foreign_field = $this->get_foreign_field();
+			$foreign_field = $this->get_foreign_field($this->foreign_model);
 			
 			$foreign_primary_key = $this->foreign_model->primary_key();
 			$id = $this->local_model->primary_key_value();
 			
-			$data = $this->foreign_model->find_by_sql("
+			$sql = "
 				SELECT
 					`{$foreign_table}`.*
 				FROM
@@ -29,7 +29,9 @@ class ActiveRelationMany extends ActiveRelation
 					right join `{$rel_table}` on `{$rel_table}`.`{$foreign_field}` = `{$foreign_table}`.`{$foreign_primary_key}`
 				WHERE
 					`{$rel_table}`.`{$local_field}` = '{$id}'
-			");
+			";
+			
+			$data = $this->foreign_model->find_by_sql($sql);
 		} else {
 			$local_field = $this->get_foreign_field($this->local_model);
 			

@@ -128,13 +128,22 @@ class Fishy_FormHelper
 		if (is_a($object, 'BlankObject')) {
 			return $fieldname;
 		} else {
-			return "data[$fieldname]";
+			$filtred_name = preg_replace('/[^a-z0-9_-]/i', '', $fieldname);
+			
+			$result = "data[$filtred_name]";
+			
+			if (Fishy_StringHelper::ends_with($fieldname, '[]')) {
+				$result .= '[]';
+			}
+			
+			return $result;
 		}
 	}
 	
 	private static function get_field_id($fieldname)
 	{
 		$object = self::get_object();
+		$fieldname = preg_replace('/[^a-z0-9_-]/', '', $fieldname);
 		
 		if (is_a($object, 'BlankObject')) {
 			return $fieldname . '_field';

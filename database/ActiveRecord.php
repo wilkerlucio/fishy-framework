@@ -359,30 +359,48 @@ abstract class ActiveRecord
 			$sql .= "WHERE ";
 			
 			if (is_array($conditions)) {
-				$factors = array();
-				
-				foreach ($conditions as $key => $value) {
-					$matches = array();
+				if (array_keys($conditions) == range(0, count($conditions) - 1)) {
+					$query = array_shift($conditions);
 					
-					if (preg_match("/([a-z_].*?)\s*((?:[><!=\s]|LIKE|IS|NOT)+)/i", $key, $matches)) {
-						$key  = $matches[1];
-						$op   = strtoupper($matches[2]);
-					} else {
-						if ($value === null) {
-							$op = 'IS';
-						} elseif (is_array($value)) {
-							$op = 'IN';
+					for($i = 0; $i < strlen($query); $i++) {
+						if ($query[$i] == '?') {
+							if (count($conditions) == 0) {
+								throw new QueryMismatchParamsException('The number of question marks is more than provided params');
+							}
+							
+							$sql .= $this->prepare_for_value(array_shift($conditions));
 						} else {
-							$op = "=";
+							$sql .= $query[$i];
 						}
 					}
 					
-					$value = $this->prepare_for_value($value);
+					$sql .= ' ';
+				} else {
+					$factors = array();
 					
-					$factors[] = "`$key` $op $value";
+					foreach ($conditions as $key => $value) {
+						$matches = array();
+						
+						if (preg_match("/([a-z_].*?)\s*((?:[><!=\s]|LIKE|IS|NOT)+)/i", $key, $matches)) {
+							$key  = $matches[1];
+							$op   = strtoupper($matches[2]);
+						} else {
+							if ($value === null) {
+								$op = 'IS';
+							} elseif (is_array($value)) {
+								$op = 'IN';
+							} else {
+								$op = "=";
+							}
+						}
+						
+						$value = $this->prepare_for_value($value);
+						
+						$factors[] = "`$key` $op $value";
+					}
+					
+					$sql .= implode(" AND ", $factors) . " ";
 				}
-				
-				$sql .= implode(" AND ", $factors) . " ";
 			} else {
 				$sql .= $conditions . " ";
 			}
@@ -827,3 +845,4 @@ abstract class ActiveRecord
 //Exceptions
 
 class InvalidRecordException extends Exception {}
+class QueryMismatchParamsException extends Exception {}
