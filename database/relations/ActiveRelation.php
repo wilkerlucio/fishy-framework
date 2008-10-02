@@ -53,6 +53,16 @@ abstract class ActiveRelation
         return $this->_data;
     }
     
+    public function get_foreign_model()
+    {
+    	return $this->foreign_model;
+    }
+    
+    public function is_loaded()
+    {
+    	return $this->_data !== null;
+    }
+    
     public abstract function set_data($data);
     
     public abstract function refresh();

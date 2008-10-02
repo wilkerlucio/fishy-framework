@@ -22,16 +22,24 @@ class Fishy_FormHelper
 		return self::build_tag('form', $html_options, null, true);
 	}
 	
+	public static function form_end()
+	{
+		array_pop(self::$form_stack);
+		
+		return '</form>';
+	}
+	
 	public static function text_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
 		$fieldname = self::get_field($field);
 		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
 		
 		$attributes = array_merge(array(
 			'id' => $fieldid,
 			'name' => $fieldname,
-			'value' => $object->$field,
+			'value' => $object->$normal,
 			'type' => 'text',
 			'class' => ''
 		), $html_options);
@@ -41,6 +49,92 @@ class Fishy_FormHelper
 		}
 		
 		return self::build_tag('input', $attributes);
+	}
+	
+	public static function text_area($field, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldname = self::get_field($field);
+		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
+		
+		$attributes = array_merge(array(
+			'id' => $fieldid,
+			'name' => $fieldname,
+			'class' => ''
+		), $html_options);
+		
+		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
+			$attributes['class'] .= ' error';
+		}
+		
+		return self::build_tag('textarea', $attributes, $object->$normal);
+	}
+	
+	public static function password_field($field, $options = array(), $html_options = array())
+	{
+		$html_options = array_merge(array('type' => 'password', 'value' => ''), $html_options);
+		
+		return self::text_field($field, $options, $html_options);
+	}
+	
+	public static function hidden_field($field, $options = array(), $html_options = array())
+	{
+		$html_options = array_merge(array('type' => 'hidden'), $html_options);
+		
+		return self::text_field($field, $options, $html_options);
+	}
+	
+	public static function relational_field($field, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$normal = self::get_normalized_field($field);
+		
+		$options = array_merge(array(
+			'id_field' => 'id',
+			'value_field' => 'name'
+		), $options);
+		
+		if (!isset($options['query'])) $options['query'] = array('select' => "{$options['id_field']}, {$options['value_field']}", 'order' => $options['value_field']);
+		
+		$foreign = $object->describe_relation($field);
+		$all = $foreign['model']->all($options['query']);
+		
+		$filter = ActiveRecord::model_diff($all, $object->$normal);
+		
+		$hidden_value = array();
+		
+		foreach ($object->$normal as $comes) {
+		    $hidden_value[] = $comes->primary_key_value();
+		}
+		
+		$hidden_value = implode(',', $hidden_value);
+		
+		$common_html = array(
+			'multiple' => 'multiple',
+			'size' => '6'
+		);
+		
+		$button_html = array(
+			'type' => 'button'
+		);
+		
+		$hidden_id = self::get_field_id($field);
+		$source_id = self::get_field_id($field . '_source');
+		$destiny_id = self::get_field_id($field . '_destiny');
+		
+		$out = '';
+		
+		$out .= self::hidden_field($field, array(), array('value' => $hidden_value));
+		$out .= self::select_for_model($field . '_source', $filter, $options['id_field'], $options['value_field'], array(), $common_html);
+		$out .= "<br /><br />";
+		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$source_id}', '#{$destiny_id}')"), $button_html), 'Adicionar');
+		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$destiny_id}', '#{$source_id}')"), $button_html), 'Remover');
+		$out .= "<br /><br />";
+		$out .= self::select_for_model($field . '_destiny', $object->$normal, $options['id_field'], $options['value_field'], array(), $common_html);
+		$out .= "<script type=\"text/javascript\"> Fishy.Util.relational_map('#{$destiny_id}', '#{$hidden_id}') </script>";
+		
+		return $out;
 	}
 	
 	/**
@@ -54,14 +148,26 @@ class Fishy_FormHelper
 		$object = self::get_object();
 		$fieldname = self::get_field($field);
 		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
 		
 		$options = array_merge(array(
 			'include_blank' => null,
 			'selected' => null
 		), $options);
 		
-		$html_options['name'] = $fieldname;
-		$html_options['id'] = $fieldid;
+		if ($options['selected'] !== null && !is_array($options['selected'])) {
+			$options['selected'] = array((string) $options['selected']);
+		}
+		
+		$html_options = array_merge(array(
+    		'name' => $fieldname,
+    		'id' => $fieldid,
+    		'class' => ''
+		), $html_options);
+		
+		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
+			$html_options['class'] .= ' error';
+		}
 		
 		$out  = '<select';
 		$out .= self::build_html_attributes($html_options);
@@ -76,7 +182,7 @@ class Fishy_FormHelper
 			
 			$attr = array('value' => $value);
 			
-			if ($options['selected'] !== null && $options['selected'] == $value) {
+			if ($options['selected'] !== null && in_array($value, $options['selected'])) {
 				$attr['selected'] = 'selected';
 			}
 			
@@ -91,8 +197,21 @@ class Fishy_FormHelper
 	public static function select_for_model($field, $collection, $value_field, $name_field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
+		$fieldname = self::get_field($field);
+		$normal = self::get_normalized_field($field);
 		
-		$options['selected'] = $object->$field;
+		$value = $object->$normal;
+		
+		if (is_array($value)) {
+			$options['selected'] = array();
+			$foreign = isset($options['foreign_value']) ? $options['foreign_value'] : 'id';
+			
+			foreach ($object->$normal as $row) {
+				$options['selected'][] = $row->$foreign;
+			}
+		} else {
+			$options['selected'] = $object->$normal;
+		}
 		
 		$choices = array();
 		
@@ -101,13 +220,6 @@ class Fishy_FormHelper
 		}
 		
 		return self::select($field, $choices, $options, $html_options);
-	}
-	
-	public static function form_end()
-	{
-		array_pop(self::$form_stack);
-		
-		return '</form>';
 	}
 	
 	private static function get_object()
@@ -121,6 +233,11 @@ class Fishy_FormHelper
 		}
 	}
 	
+	private static function get_normalized_field($fieldname)
+	{
+		return preg_replace('/[^a-z0-9_-]/i', '', $fieldname);
+	}
+	
 	private static function get_field($fieldname)
 	{
 		$object = self::get_object();
@@ -128,7 +245,7 @@ class Fishy_FormHelper
 		if (is_a($object, 'BlankObject')) {
 			return $fieldname;
 		} else {
-			$filtred_name = preg_replace('/[^a-z0-9_-]/i', '', $fieldname);
+			$filtred_name = self::get_normalized_field($fieldname);
 			
 			$result = "data[$filtred_name]";
 			
@@ -143,7 +260,7 @@ class Fishy_FormHelper
 	private static function get_field_id($fieldname)
 	{
 		$object = self::get_object();
-		$fieldname = preg_replace('/[^a-z0-9_-]/', '', $fieldname);
+		$fieldname = self::get_normalized_field($fieldname);
 		
 		if (is_a($object, 'BlankObject')) {
 			return $fieldname . '_field';

@@ -147,7 +147,8 @@ abstract class ActiveRecord
 			'limit'      => '',
 			'offset'     => false,
 			'select'     => '*',
-			'from'       => '`' . $this->table() . '`'
+			'from'       => '`' . $this->table() . '`',
+			'groupby'    => ''
 		), $options);
 		
 		switch ($what) {
@@ -347,6 +348,7 @@ abstract class ActiveRecord
 		$sql .= "FROM {$options['from']} ";
 		
 		$this->add_conditions($sql, $options['conditions']);
+		$this->add_groupby($sql, $options['groupby']);
 		$this->add_order($sql, $options['order']);
 		$this->add_limit($sql, $options['limit'], $options['offset']);
 		
@@ -404,6 +406,13 @@ abstract class ActiveRecord
 			} else {
 				$sql .= $conditions . " ";
 			}
+		}
+	}
+	
+	private function add_groupby(&$sql, $order)
+	{
+		if ($order) {
+			$sql .= "GROUP BY $order ";
 		}
 	}
 	
@@ -765,6 +774,48 @@ abstract class ActiveRecord
 		$this->has_one($model, $options);
 	}
 	
+	public function describe_relation($rel)
+	{
+		if (!isset($this->_relations[$rel])) {
+			return null;
+		}
+		
+		$r = $this->_relations[$rel];
+		
+		return array(
+			'kind' => get_class($r),
+			'model' => $r->get_foreign_model(),
+			'loaded' => $r->is_loaded()
+		);
+	}
+	
+	public static function model_diff($col1, $col2)
+	{
+		$keeplist = array();
+		
+		foreach ($col1 as $item) {
+			$keep = true;
+			
+			foreach ($col2 as $item2) {
+				if ($item->equal($item2)) {
+					$keep = false;
+					break;
+				}
+			}
+			
+			if ($keep) {
+				$keeplist[] = $item;
+			}
+		}
+		
+		return $keeplist;
+	}
+	
+	public function equal($obj2)
+	{
+		return ($obj2->table() == $this->table()) && ($obj2->primary_key_value() == $this->primary_key_value());
+	}
+	
 	//Validators
 	
 	private function register_validator($validator, $arguments)
@@ -782,7 +833,7 @@ abstract class ActiveRecord
 	
 	public function is_valid()
 	{
-		$valid = true;
+		$valid = $this->validate();
 		$this->_errors = array();
 		
 		foreach ($this->_validators as $validator) {
@@ -824,7 +875,7 @@ abstract class ActiveRecord
 		return isset($this->_errors[$field]) ? $this->_errors[$field] : array();
 	}
 	
-	//TODO: add support for user validators
+	public function validate() { return true; }
 	
 	//Events
 	
