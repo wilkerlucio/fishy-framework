@@ -361,7 +361,7 @@ abstract class ActiveRecord
 			$sql .= "WHERE ";
 			
 			if (is_array($conditions)) {
-				if (array_keys($conditions) == range(0, count($conditions) - 1)) {
+				if (array_keys($conditions) === range(0, count($conditions) - 1)) {
 					$query = array_shift($conditions);
 					
 					for($i = 0; $i < strlen($query); $i++) {
