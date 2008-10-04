@@ -657,7 +657,13 @@ abstract class ActiveRecord
 		if (method_exists($this, 'get_' . $attribute)) {
 			return call_user_func(array($this, 'get_' . $attribute));
 		}
+
+		//check for id
+		if ($attribute == 'id') {
+			return $this->primary_key_value();
+		}
 		
+		//check for relation
 		if (isset($this->_relations[$attribute])) {
 			return $this->_relations[$attribute]->get_data();
 		}
