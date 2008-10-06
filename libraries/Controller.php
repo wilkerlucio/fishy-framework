@@ -91,7 +91,7 @@ abstract class Fishy_Controller
 	 *
 	 * @action The action to be rendered
 	 */
-	public function render($action, $options = array())
+	protected function render($action, $options = array())
 	{
 		$options = array_merge($this->render_options(), $options);
 		
@@ -131,7 +131,7 @@ abstract class Fishy_Controller
 	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
 	 * @return mixed
 	 */
-	public function render_partial($partial, $data = null, $options = array())
+	protected function render_partial($partial, $data = null, $options = array())
 	{
 		$options = array_merge($this->render_options(), $options);
 		
@@ -160,7 +160,7 @@ abstract class Fishy_Controller
 	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
 	 * @return mixed
 	 */
-	public function render_collection($partial, $collection, $return = false)
+	protected function render_collection($partial, $collection, $return = false)
 	{
 		$output = array();
 		
@@ -183,7 +183,7 @@ abstract class Fishy_Controller
 	 * @param $path The path to be redirected, this path works like if you are using site_url() method
 	 * @return void
 	 */
-	public function redirect_to($path)
+	protected function redirect_to($path)
 	{
 		header('Location: ' . $this->site_url($path));
 		exit;
@@ -195,7 +195,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	public final function base_url($sulfix = '')
+	protected final function base_url($sulfix = '')
 	{
 		return FISHY_BASE_URL . $sulfix;
 	}
@@ -206,7 +206,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	public function site_url($sulfix = '')
+	protected function site_url($sulfix = '')
 	{
 		return $this->base_url(FISHY_INDEX_PAGE . $sulfix);
 	}
@@ -217,7 +217,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	public function public_url($sulfix = '')
+	protected function public_url($sulfix = '')
 	{
 		return $this->base_url('public/' . $sulfix);
 	}
@@ -229,17 +229,17 @@ abstract class Fishy_Controller
 	 * @param $default The default value (if propertie doesn't exists)
 	 * @return mixed
 	 */
-	public function get($propertie, $default = null)
+	protected function get($propertie, $default = null)
 	{
 		return isset($this->_data[$propertie]) ? $this->_data[$propertie] : $default;
 	}
 	
-	public function __get($propertie)
+	protected function __get($propertie)
 	{
 		return $this->get($propertie);
 	}
 	
-	public function __set($propertie, $value)
+	protected function __set($propertie, $value)
 	{
 		$this->_data[$propertie] = $value;
 	}
