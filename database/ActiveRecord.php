@@ -91,7 +91,7 @@ abstract class ActiveRecord
 	{
 		$pk = $this->primary_key();
 		
-		return $this->$pk;
+		return $this->read_attribute($pk);
 	}
 	
 	/**
