@@ -753,24 +753,28 @@ abstract class ActiveRecord
 	 * @return void
 	 * @author wilker
 	 */
-	protected function has_one($model, $options = array())
+	protected function has_one($expression, $options = array())
 	{
-		$this->_relations[$model] = new ActiveRelationOne($this, $model, $options);
+		list($model, $name) = $this->parse_relation_expression($expression);
+		
+		$this->_relations[$name] = new ActiveRelationOne($this, $model, $options);
 	}
 	
 	/**
-	 * 
+	 * Estabilishy a connection with many related records
 	 *
 	 * @return void
 	 * @author wilker
 	 */
-	protected function has_many($model, $options = array())
+	protected function has_many($expression, $options = array())
 	{
-		$this->_relations[$model] = new ActiveRelationMany($this, Inflect::singularize($model), $options);
+		list($model, $name) = $this->parse_relation_expression($expression);
+		
+		$this->_relations[$name] = new ActiveRelationMany($this, Inflect::singularize($model), $options);
 	}
 	
 	/**
-	 * 
+	 * Aliases to has one
 	 *
 	 * @return void
 	 * @author wilker
@@ -778,6 +782,27 @@ abstract class ActiveRecord
 	protected function belongs_to($model, $options = array())
 	{
 		$this->has_one($model, $options);
+	}
+	
+	/**
+	 * Gives a relation expression and return elements
+	 *
+	 * @param string $expression Expression to be evaluated
+	 * @return array Array containing: [0] => name of relation, [1] => foreign model
+	 */
+	protected function parse_relation_expression($expression)
+	{
+		$parts = explode(' as ', $expression);
+		
+		$model = $parts[0];
+		
+		if (count($parts) > 1) {
+			$name = $parts[1];
+		} else {
+			$name = $model;
+		}
+		
+		return array($model, $name);
 	}
 	
 	public function describe_relation($rel)
@@ -882,6 +907,14 @@ abstract class ActiveRecord
 	}
 	
 	public function validate() { return true; }
+	
+	//Tree Helpers
+	
+	protected function act_as_tree($parent_field = 'parent_id')
+	{
+		$this->has_many(strtolower(Inflect::pluralize(get_class($this))) . ' as childs', array('foreign_field' => $parent_field));
+		$this->belongs_to(strtolower(get_class($this)) . ' as parent', array('foreign_field' => $parent_field));
+	}
 	
 	//Events
 	
