@@ -104,17 +104,14 @@ class Fishy_Image {
      * @return void
      */
     public function output($type = IMAGETYPE_JPEG, $include_headers = true) {
+    	$data = $this->bdata($type);
+    	
         if ($include_headers) {
             header('Content-Type: ' . image_type_to_mime_type($type));
+            header('Content-Length: ' . strlen($data));
         }
         
-        $fn = $this->output_function($type);
-        
-        if ($fn === false) {
-            throw new Fishy_Image_Exception($this, "File type " . image_type_to_mime_type($info[2]) . " is not supported");
-        }
-        
-        $fn($this->image);
+        echo $data;
     }
     
     /**
@@ -124,8 +121,14 @@ class Fishy_Image {
      * @return string Binary data of image
      */
     public function bdata($type = IMAGETYPE_JPEG) {
+        $fn = $this->output_function($type);
+        
+        if ($fn === false) {
+            throw new Fishy_Image_Exception($this, "File type " . image_type_to_mime_type($info[2]) . " is not supported");
+        }
+        
         ob_start();
-        $this->output($type, false);
+        $fn($this->image);
         $data = ob_get_clean();
         
         return $data;
