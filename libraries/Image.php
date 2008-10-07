@@ -218,7 +218,7 @@ class Fishy_Image {
         	throw new Fishy_Image_Exception($this, "Error opening image file, probably corrupted data");
         }
         
-        return $fn($path);
+        return $image;
     }
     
     /**
