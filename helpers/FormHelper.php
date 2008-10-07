@@ -222,6 +222,37 @@ class Fishy_FormHelper
 		return self::select($field, $choices, $options, $html_options);
 	}
 	
+	public static function checkbox_tree($field, $roots, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldname = self::get_field($field);
+		$normal = self::get_normalized_field($field);
+		
+		$options = array_merge(array(
+			'value_field' => 'id',
+			'label_field' => 'name'
+		), $options);
+		
+		$html_options = array_merge(array(
+			'type' => 'checkbox',
+			'name' => $fieldname
+		), $html_options);
+		
+		$content = '';
+		
+		foreach ($roots as $item) {
+			$html_options['value'] = $item->$options['value_field'];
+			
+			$tag = self::build_tag('input', array('type' => 'checkbox'));
+			$tag .= $item->$options['label_field'];
+			$tag .= self::checkbox_tree($field, $item->childs, $options, $html_options);
+			
+			$content .= self::build_tag('li', $html_options, $tag);
+		}
+		
+		return self::build_tag('ul', array(), $content);
+	}
+	
 	private static function get_object()
 	{
 		$stack_size = count(self::$form_stack);
