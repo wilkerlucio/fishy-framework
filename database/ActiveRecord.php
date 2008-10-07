@@ -22,6 +22,8 @@ abstract class ActiveRecord
 	private $_relations;
 	private $_validators;
 	private $_errors;
+	private $_scopes;
+	private $_scopes_enabled;
 	
 	/**
 	 * Creates a new record
@@ -36,6 +38,8 @@ abstract class ActiveRecord
 		$this->_relations = array();
 		$this->_validators = array();
 		$this->_errors = array();
+		$this->_scopes = array();
+		$this->_scopes_enabled = array();
 		
 		$this->initialize_fields();
 		$this->fill($params);
@@ -357,56 +361,71 @@ abstract class ActiveRecord
 	
 	private function add_conditions(&$sql, $conditions)
 	{
+		$nest = array();
+		
+		foreach ($this->_scopes_enabled as $scope) {
+			$nest[] = $this->build_conditions($this->_scopes[$scope]);
+		}
+		
 		if ($conditions) {
-			$sql .= "WHERE ";
-			
-			if (is_array($conditions)) {
-				if (array_keys($conditions) === range(0, count($conditions) - 1)) {
-					$query = array_shift($conditions);
-					
-					for($i = 0; $i < strlen($query); $i++) {
-						if ($query[$i] == '?') {
-							if (count($conditions) == 0) {
-								throw new QueryMismatchParamsException('The number of question marks is more than provided params');
-							}
-							
-							$sql .= $this->prepare_for_value(array_shift($conditions));
-						} else {
-							$sql .= $query[$i];
-						}
-					}
-					
-					$sql .= ' ';
-				} else {
-					$factors = array();
-					
-					foreach ($conditions as $key => $value) {
-						$matches = array();
-						
-						if (preg_match("/([a-z_].*?)\s*((?:[><!=\s]|LIKE|IS|NOT)+)/i", $key, $matches)) {
-							$key  = $matches[1];
-							$op   = strtoupper($matches[2]);
-						} else {
-							if ($value === null) {
-								$op = 'IS';
-							} elseif (is_array($value)) {
-								$op = 'IN';
-							} else {
-								$op = "=";
-							}
+			$nest[] = $this->build_conditions($conditions);
+		}
+		
+		if (count($nest) > 0) {
+			$sql .= 'WHERE (' . implode(') AND (', $nest) . ') ';
+		}
+	}
+	
+	private function build_conditions($conditions)
+	{
+		$sql = '';
+		
+		if (is_array($conditions)) {
+			if (array_keys($conditions) === range(0, count($conditions) - 1)) {
+				$query = array_shift($conditions);
+				
+				for($i = 0; $i < strlen($query); $i++) {
+					if ($query[$i] == '?') {
+						if (count($conditions) == 0) {
+							throw new QueryMismatchParamsException('The number of question marks is more than provided params');
 						}
 						
-						$value = $this->prepare_for_value($value);
-						
-						$factors[] = "`$key` $op $value";
+						$sql .= $this->prepare_for_value(array_shift($conditions));
+					} else {
+						$sql .= $query[$i];
 					}
-					
-					$sql .= implode(" AND ", $factors) . " ";
 				}
 			} else {
-				$sql .= $conditions . " ";
+				$factors = array();
+				
+				foreach ($conditions as $key => $value) {
+					$matches = array();
+					
+					if (preg_match("/([a-z_].*?)\s*((?:[><!=\s]|LIKE|IS|NOT)+)/i", $key, $matches)) {
+						$key  = $matches[1];
+						$op   = strtoupper($matches[2]);
+					} else {
+						if ($value === null) {
+							$op = 'IS';
+						} elseif (is_array($value)) {
+							$op = 'IN';
+						} else {
+							$op = "=";
+						}
+					}
+					
+					$value = $this->prepare_for_value($value);
+					
+					$factors[] = "`$key` $op $value";
+				}
+				
+				$sql .= implode(" AND ", $factors);
 			}
+		} else {
+			$sql .= $conditions;
 		}
+		
+		return $sql;
 	}
 	
 	private function add_groupby(&$sql, $order)
@@ -663,6 +682,11 @@ abstract class ActiveRecord
 			return $this->primary_key_value();
 		}
 		
+		//check for named scope
+		if (isset($this->_scopes[$attribute])) {
+			return $this->append_scope($attribute);
+		}
+		
 		//check for relation
 		if (isset($this->_relations[$attribute])) {
 			return $this->_relations[$attribute]->get_data();
@@ -907,6 +931,27 @@ abstract class ActiveRecord
 	}
 	
 	public function validate() { return true; }
+	
+	//Named Scopes
+	
+	protected function named_scope($scope, $conditions)
+	{
+		$this->_scopes[$scope] = $conditions;
+	}
+	
+	private function append_scope($scope)
+	{
+		$class = get_class($this);
+		$scoped = new $class;
+		
+		foreach ($this->_scopes_enabled as $se) {
+			$scoped->_scopes_enabled[] = $se;
+		}
+		
+		$scoped->_scopes_enabled[] = $scope;
+		
+		return $scoped;
+	}
 	
 	//Tree Helpers
 	
