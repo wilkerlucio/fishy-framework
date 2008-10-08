@@ -47,6 +47,12 @@ abstract class ActiveRecord
 		$this->setup();
 	}
 	
+	/**
+	 * Get a shared instace of current model
+	 *
+	 * @param string $model_name The name of model
+	 * @return mixed The model instance
+	 */
 	public static function model($model_name)
 	{
 		$modelcache = ModelCache::get_instance();
@@ -829,6 +835,12 @@ abstract class ActiveRecord
 		return array($model, $name);
 	}
 	
+	/**
+	 * Get the definition of a relation
+	 *
+	 * @param string $rel The name of relation to check
+	 * @return array Array with relation data
+	 */
 	public function describe_relation($rel)
 	{
 		if (!isset($this->_relations[$rel])) {
@@ -844,6 +856,13 @@ abstract class ActiveRecord
 		);
 	}
 	
+	/**
+	 * Compare two arrays of to get different records of then
+	 *
+	 * @param array $col1 First array
+	 * @param array $col2 Second array
+	 * @return array Array with difference between first and second collections
+	 */
 	public static function model_diff($col1, $col2)
 	{
 		$keeplist = array();
@@ -866,6 +885,12 @@ abstract class ActiveRecord
 		return $keeplist;
 	}
 	
+	/**
+	 * Test if current object is equals to another
+	 *
+	 * @param object $obj2 The model to test
+	 * @return boolean
+	 */
 	public function equal($obj2)
 	{
 		return ($obj2->table() == $this->table()) && ($obj2->primary_key_value() == $this->primary_key_value());
@@ -886,6 +911,11 @@ abstract class ActiveRecord
 		}
 	}
 	
+	/**
+	 * Test if current object is valid
+	 *
+	 * @return boolean
+	 */
 	public function is_valid()
 	{
 		$valid = $this->validate();
@@ -902,16 +932,34 @@ abstract class ActiveRecord
 		return $valid;
 	}
 	
+	/**
+	 * Inject one error at object
+	 *
+	 * @param string $field The name of field that has the error
+	 * @param string $error Error message
+	 * @return void
+	 */
 	public function add_error($field, $error)
 	{
 		$this->_errors[$field][] = $error;
 	}
 	
+	/**
+	 * Check if a field contains errors
+	 *
+	 * @param string $field The name of field to check
+	 * @return boolean
+	 */
 	public function field_has_errors($field)
 	{
 		return isset($this->_errors[$field]);
 	}
 	
+	/**
+	 * Get a flatten array with all errors
+	 *
+	 * @return array
+	 */
 	public function problems()
 	{
 		$flat = array();
@@ -925,15 +973,31 @@ abstract class ActiveRecord
 		return $flat;
 	}
 	
+	/**
+	 * Get all errors of one field
+	 *
+	 * @param string $field The name of field
+	 * @return array
+	 */
 	public function field_problems($field)
 	{
 		return isset($this->_errors[$field]) ? $this->_errors[$field] : array();
 	}
 	
+	/**
+	 * Override this method to enable custom validations
+	 */
 	public function validate() { return true; }
 	
 	//Named Scopes
 	
+	/**
+	 * Create a new scope into model
+	 *
+	 * @param string $scope The name of new scope
+	 * @param mixed $conditions The conditions of scope, this variable can be like conditions statement of query
+	 * @return void
+	 */
 	protected function named_scope($scope, $conditions)
 	{
 		$this->_scopes[$scope] = $conditions;
@@ -955,6 +1019,12 @@ abstract class ActiveRecord
 	
 	//Tree Helpers
 	
+	/**
+	 * Make a tree like relations to model
+	 *
+	 * @param string $parent_field The name of field that make relation possible
+	 * @return void
+	 */
 	protected function act_as_tree($parent_field = 'parent_id')
 	{
 		$this->has_many(strtolower(Inflect::pluralize(get_class($this))) . ' as childs', array('foreign_field' => $parent_field));
