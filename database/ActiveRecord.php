@@ -734,7 +734,7 @@ abstract class ActiveRecord
 	{
 		//try to catch validator assign
 		if (substr($name, 0, 9) == 'validates') {
-			$this->register_validator($name, $arguments);
+			return $this->register_validator($name, $arguments);
 		}
 		
 		//try to catch dynamic find
