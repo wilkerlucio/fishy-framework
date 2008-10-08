@@ -744,7 +744,7 @@ abstract class ActiveRecord
 			return $this->dynamic_find($matches[1], $matches[2], $arguments);
 		}
 		
-		//throw new ActiveRecordInvalidMethodException()
+		throw new Exception("Method $name doesn't exists.");
 	}
 	
 	public function __toString() {
