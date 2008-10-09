@@ -152,7 +152,7 @@ class Fishy_FormHelper
 		
 		$options = array_merge(array(
 			'include_blank' => null,
-			'selected' => null
+			'selected' => $object->$normal
 		), $options);
 		
 		if ($options['selected'] !== null && !is_array($options['selected'])) {
@@ -177,9 +177,7 @@ class Fishy_FormHelper
 			$out .= "<option value=\"\">{$options['include_blank']}</option>";
 		}
 		
-		foreach ($choices as $pair) {
-			list($name, $value) = $pair;
-			
+		foreach ($choices as $value => $name) {
 			$attr = array('value' => $value);
 			
 			if ($options['selected'] !== null && in_array($value, $options['selected'])) {
@@ -216,7 +214,7 @@ class Fishy_FormHelper
 		$choices = array();
 		
 		foreach ($collection as $item) {
-			$choices[] = array($item->$name_field, $item->$value_field);
+			$choices[$item->$value_field] = $item->$name_field;
 		}
 		
 		return self::select($field, $choices, $options, $html_options);
