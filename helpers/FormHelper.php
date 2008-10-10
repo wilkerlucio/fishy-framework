@@ -241,7 +241,7 @@ class Fishy_FormHelper
 		foreach ($roots as $item) {
 			$html_options['value'] = $item->$options['value_field'];
 			
-			$tag = self::build_tag('input', array('type' => 'checkbox'));
+			$tag  = self::build_tag('input', array('type' => 'checkbox'));
 			$tag .= $item->$options['label_field'];
 			$tag .= self::checkbox_tree($field, $item->childs, $options, $html_options);
 			
