@@ -24,4 +24,11 @@ class Fishy_ArrayHelper
 		
 		return false;
 	}
+	
+	public static function array_push(&$origin, $data)
+	{
+		foreach ($data as $value) {
+			$origin[] = $value;
+		}
+	}
 }

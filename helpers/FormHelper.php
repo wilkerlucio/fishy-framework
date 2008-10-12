@@ -126,12 +126,12 @@ class Fishy_FormHelper
 		$out = '';
 		
 		$out .= self::hidden_field($field, array(), array('value' => $hidden_value));
-		$out .= self::select_for_model($field . '_source', $filter, $options['id_field'], $options['value_field'], array(), $common_html);
+		$out .= self::select_for_model($field . '_source', $filter, $options['value_field'], $options['id_field'], array(), $common_html);
 		$out .= "<br /><br />";
 		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$source_id}', '#{$destiny_id}')"), $button_html), 'Adicionar');
 		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$destiny_id}', '#{$source_id}')"), $button_html), 'Remover');
 		$out .= "<br /><br />";
-		$out .= self::select_for_model($field . '_destiny', $object->$normal, $options['id_field'], $options['value_field'], array(), $common_html);
+		$out .= self::select_for_model($field . '_destiny', $object->$normal, $options['value_field'], $options['id_field'], array(), $common_html);
 		$out .= "<script type=\"text/javascript\"> Fishy.Util.relational_map('#{$destiny_id}', '#{$hidden_id}') </script>";
 		
 		return $out;
@@ -152,7 +152,7 @@ class Fishy_FormHelper
 		
 		$options = array_merge(array(
 			'include_blank' => null,
-			'selected' => null
+			'selected' => $object->$normal
 		), $options);
 		
 		if ($options['selected'] !== null && !is_array($options['selected'])) {
@@ -177,9 +177,7 @@ class Fishy_FormHelper
 			$out .= "<option value=\"\">{$options['include_blank']}</option>";
 		}
 		
-		foreach ($choices as $pair) {
-			list($name, $value) = $pair;
-			
+		foreach ($choices as $value => $name) {
 			$attr = array('value' => $value);
 			
 			if ($options['selected'] !== null && in_array($value, $options['selected'])) {
@@ -194,7 +192,7 @@ class Fishy_FormHelper
 		return $out;
 	}
 	
-	public static function select_for_model($field, $collection, $value_field, $name_field, $options = array(), $html_options = array())
+	public static function select_for_model($field, $collection, $name_field, $value_field = 'id', $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
 		$fieldname = self::get_field($field);
@@ -216,7 +214,7 @@ class Fishy_FormHelper
 		$choices = array();
 		
 		foreach ($collection as $item) {
-			$choices[] = array($item->$name_field, $item->$value_field);
+			$choices[$item->$value_field] = $item->$name_field;
 		}
 		
 		return self::select($field, $choices, $options, $html_options);
@@ -243,7 +241,7 @@ class Fishy_FormHelper
 		foreach ($roots as $item) {
 			$html_options['value'] = $item->$options['value_field'];
 			
-			$tag = self::build_tag('input', array('type' => 'checkbox'));
+			$tag  = self::build_tag('input', array('type' => 'checkbox'));
 			$tag .= $item->$options['label_field'];
 			$tag .= self::checkbox_tree($field, $item->childs, $options, $html_options);
 			
