@@ -49,16 +49,16 @@ class Fishy_StringHelper
 	
 	public static function camelize($name) {
 		$name = strtolower($name);
-		$normalized = array();
+		$normalized = "";
 		
 		$upper = true;
 		
 		for ($i = 0; $i < strlen($name); $i++) {
-			$normalized[] = $upper ? strtoupper($name[$i]) : $name[$i];
+			$normalized .= $upper ? strtoupper($name[$i]) : $name[$i];
 			if ($upper) $upper = false;
 			if ($name[$i] == '_') $upper = true;
 		}
 		
-		return implode('', $normalized);
+		return $normalized;
 	}
 }
