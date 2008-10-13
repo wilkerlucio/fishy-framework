@@ -44,10 +44,14 @@ class ActiveRelationMany extends ActiveRelation
 	public function set_data($data)
 	{
 		if (is_string($data)) {
-			$data = $this->foreign_model->find(explode(',', $data));
+			$data = explode(',', $data);
 		}
 		
 		if (is_array($data)) {
+			if (count($data) > 0 && !is_a($data[0], 'ActiveRecord')) {
+				$data = $this->foreign_model->find($data);
+			}
+			
 			$add = ActiveRecord::model_diff($data, $this->get_data());
 			$rem = ActiveRecord::model_diff($this->get_data(), $data);
 			
