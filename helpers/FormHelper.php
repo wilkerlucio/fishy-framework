@@ -232,7 +232,8 @@ class Fishy_FormHelper
 		
 		$options = array_merge(array(
 			'value_field' => 'id',
-			'label_field' => 'name'
+			'label_field' => 'name',
+			'selected' => array()
 		), $options);
 		
 		$html_options = array_merge(array(
@@ -244,6 +245,12 @@ class Fishy_FormHelper
 		
 		foreach ($roots as $item) {
 			$html_options['value'] = $item->$options['value_field'];
+			
+			if (in_array($item->$options['value_field'], $options['selected'])) {
+				$html_options['checked'] = 'checked';
+			} else {
+				unset($html_options['checked']);
+			}
 			
 			$tag  = self::build_tag('input', $html_options);
 			$tag .= $item->$options['label_field'];
