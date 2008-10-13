@@ -222,6 +222,10 @@ class Fishy_FormHelper
 	
 	public static function checkbox_tree($field, $roots, $options = array(), $html_options = array())
 	{
+		if (count($roots) == 0) {
+			return '';
+		}
+		
 		$object = self::get_object();
 		$fieldname = self::get_field($field);
 		$normal = self::get_normalized_field($field);
@@ -241,11 +245,11 @@ class Fishy_FormHelper
 		foreach ($roots as $item) {
 			$html_options['value'] = $item->$options['value_field'];
 			
-			$tag  = self::build_tag('input', array('type' => 'checkbox'));
+			$tag  = self::build_tag('input', $html_options);
 			$tag .= $item->$options['label_field'];
 			$tag .= self::checkbox_tree($field, $item->childs, $options, $html_options);
 			
-			$content .= self::build_tag('li', $html_options, $tag);
+			$content .= self::build_tag('li', array(), $tag);
 		}
 		
 		return self::build_tag('ul', array(), $content);
