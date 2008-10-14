@@ -223,6 +223,42 @@ abstract class Fishy_Controller
 	}
 	
 	/**
+	 * Find a element at $_GET, or return a default value
+	 *
+	 * @param string $propertie The name of propertie
+	 * @param mixed $default The default value
+	 * @return mixed
+	 */
+	protected function gp($propertie, $default = null)
+	{
+		return isset($_GET[$propertie]) ? $_GET[$propertie] : $default;
+	}
+	
+	/**
+	 * Find a element at $_POST, or return a default value
+	 *
+	 * @param string $propertie The name of propertie
+	 * @param mixed $default The default value
+	 * @return mixed
+	 */
+	protected function pp($propertie, $default = null)
+	{
+		return isset($_POST[$propertie]) ? $_POST[$propertie] : $default;
+	}
+	
+	/**
+	 * Find a element at $_SESSION, or return a default value
+	 *
+	 * @param string $propertie The name of propertie
+	 * @param mixed $default The default value
+	 * @return mixed
+	 */
+	protected function sp($propertie, $default = null)
+	{
+		return isset($_SESSION[$propertie]) ? $_SESSION[$propertie] : $default;
+	}
+	
+	/**
 	 * Get a value at data store
 	 *
 	 * @param $propertie The name o propertie
