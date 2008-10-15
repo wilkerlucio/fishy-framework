@@ -2,16 +2,19 @@
 
 abstract class Fishy_Controller
 {
+	protected $_current_route;
 	protected $_data;
 	protected $_render;
 	protected $_render_layout;
 	protected $_layout;
+	protected $_page_cache;
 	
 	public final function __construct()
 	{
 		$this->_data = array();
 		$this->_render = true;
 		$this->_render_layout = true;
+		$this->_page_cache = false;
 		$this->_layout = $this->classname();
 		
 		$this->initialize();
@@ -60,6 +63,11 @@ abstract class Fishy_Controller
 		if ($this->_render) {
 			$this->render($method);
 		}
+		
+		if ($this->_page_cache) {
+			$data = ob_get_flush();
+			$file = Fishy_Cache::cache($this->_current_route, $data);
+		}
 	}
 	
 	/**
@@ -75,6 +83,7 @@ abstract class Fishy_Controller
 		$method = strtolower(array_shift($args));
 		
 		$controller = new $controller_name();
+		$controller->_current_route = $route;
 		$controller->execute($method, $args);
 	}
 	
@@ -165,7 +174,7 @@ abstract class Fishy_Controller
 		$output = array();
 		
 		foreach ($collection as $data) {
-			$output[] = $this->render_partial($partial, $data, true);
+			$output[] = $this->render_partial($partial, $data, array('return' => true));
 		}
 		
 		$output = implode('', $output);
@@ -220,6 +229,18 @@ abstract class Fishy_Controller
 	protected function public_url($sulfix = '')
 	{
 		return $this->base_url('public/' . $sulfix);
+	}
+	
+	/**
+	 * Schedule cache when page load is finished
+	 *
+	 * @return void
+	 */
+	protected function cache_output()
+	{
+		$this->_page_cache = true;
+		
+		ob_start();
 	}
 	
 	/**

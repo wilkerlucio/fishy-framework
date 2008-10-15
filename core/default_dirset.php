@@ -2,6 +2,7 @@
 
 //application directory definitions
 define('FISHY_APP_PATH', FISHY_ROOT_PATH . '/app');
+define('FISHY_CACHE_PATH', FISHY_ROOT_PATH . '/cache');
 define('FISHY_CONFIG_PATH', FISHY_ROOT_PATH . '/config');
 define('FISHY_DB_PATH', FISHY_ROOT_PATH . '/db');
 define('FISHY_LOG_PATH', FISHY_ROOT_PATH . '/log');
