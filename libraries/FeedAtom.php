@@ -19,9 +19,9 @@ class Fishy_FeedAtom
 		
 		$output->appendln("<id>{$this->data->website}</id>");
 		$output->appendln("<title>{$this->data->title}</title>");
-		$output->appendln("<subtitle>{$this->data->description}</subtitle>");
 		$output->appendln("<updated>{$this->data->last_change}</updated>");
 		
+		if ($this->data->description) $output->appendln("<subtitle>{$this->data->description}</subtitle>");
 		if ($this->data->copyright) $output->appendln("<rights>{$this->data->copyright}</rights>");
 		if ($this->data->generator) $output->appendln("<generator>{$this->data->generator}</generator>");
 		
