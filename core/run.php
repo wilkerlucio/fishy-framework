@@ -5,6 +5,9 @@
 //set some system definitios
 define('FISHY_SYSTEM_CLASS_PREFIX', 'Fishy_');
 
+//load core exceptions
+require_once FISHY_SYSTEM_CORE_PATH . '/core_exceptions.php';
+
 //autoloader for classes
 include_once FISHY_SYSTEM_CORE_PATH . '/autoloader.php';
 
