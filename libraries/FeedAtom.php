@@ -17,11 +17,11 @@ class Fishy_FeedAtom
 		$output->appendln('<feed xmlns="http://www.w3.org/2005/Atom">');
 		$output->increase_indent();
 		
+		$output->appendln("<id>{$this->data->website}</id>");
 		$output->appendln("<title>{$this->data->title}</title>");
-		$output->appendln("<description>{$this->data->description}</description>");
+		$output->appendln("<subtitle>{$this->data->description}</subtitle>");
 		$output->appendln("<updated>{$this->data->last_change}</updated>");
 		
-		if ($this->data->website) $output->appendln("<link href=\"{$this->data->website}\" />");
 		if ($this->data->copyright) $output->appendln("<rights>{$this->data->copyright}</rights>");
 		if ($this->data->generator) $output->appendln("<generator>{$this->data->generator}</generator>");
 		
