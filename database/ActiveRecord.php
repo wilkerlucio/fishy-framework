@@ -542,11 +542,13 @@ abstract class ActiveRecord
 			$this->before_update();
 			$this->validate_ex();
 			$this->update();
+			$this->save_relations();
 			$this->after_update();
 		} else {
 			$this->before_create();
 			$this->validate_ex();
 			$this->create();
+			$this->save_relations();
 			$this->after_create();
 		}
 		
@@ -593,6 +595,13 @@ abstract class ActiveRecord
 		$sql = "UPDATE `$table` SET $sql_set WHERE `$pk` = '$pk_value';";
 		
 		DbCommand::execute($sql);
+	}
+	
+	private function save_relations()
+	{
+		foreach ($this->_relations as $rel) {
+			$rel->save();
+		}
 	}
 	
 	private function fields()

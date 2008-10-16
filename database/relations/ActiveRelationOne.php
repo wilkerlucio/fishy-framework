@@ -20,7 +20,7 @@ class ActiveRelationOne extends ActiveRelation
         return $data;
     }
     
-    public function set_data($data)
+    public function push($data)
     {
         $foreign_field = $this->get_foreign_field($this->foreign_model);
         

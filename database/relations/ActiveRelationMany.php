@@ -41,7 +41,7 @@ class ActiveRelationMany extends ActiveRelation
 		return $data;
 	}
 	
-	public function set_data($data)
+	public function push($data)
 	{
 		if (is_string($data)) {
 			$data = explode(',', $data);

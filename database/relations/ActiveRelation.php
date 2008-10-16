@@ -12,6 +12,8 @@ require_once(dirname(__FILE__) . '/../ActiveRecord.php');
 abstract class ActiveRelation
 {
     private $_data;
+    private $_newdata;
+    private $_changed;
     
     protected $local_model;
     protected $foreign_model;
@@ -24,6 +26,8 @@ abstract class ActiveRelation
         $this->options = $options;
         
         $this->_data = null;
+        $this->_newdata = null;
+        $this->_changed = false;
     }
     
     public function get_local_field()
@@ -63,7 +67,19 @@ abstract class ActiveRelation
     	return $this->_data !== null;
     }
     
-    public abstract function set_data($data);
+    public function set_data($data)
+    {
+    	$this->_newdata = $data;
+    	$this->_changed = true;
+    }
+    
+    public function save()
+    {
+    	if ($this->_changed) {
+    		$this->push($this->_newdata);
+    	}
+    }
     
     public abstract function refresh();
+    public abstract function push($data);
 } // END abstract class ActiveRelation
