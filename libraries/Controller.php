@@ -111,11 +111,11 @@ abstract class Fishy_Controller
 		if (file_exists($view_path)) {
 			include $view_path;
 		}
-
+		
 		$output = ob_get_clean();
-
+		
 		$layout = FISHY_VIEWS_PATH . '/layouts/' . $this->_layout . '.php';
-
+		
 		if (file_exists($layout) && $this->_render_layout) {
 			$content = $output;
 			ob_start();
@@ -124,7 +124,7 @@ abstract class Fishy_Controller
 		}
 		
 		$this->_render = false;
-
+		
 		if ($options['return']) {
 			return $output;
 		} else {
