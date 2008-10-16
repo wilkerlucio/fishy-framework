@@ -320,7 +320,7 @@ class Fishy_FormHelper
 		return $out;
 	}
 	
-	private static function build_tag($tagname, $attributes = array(), $content = null, $force_open = false)
+	private static function build_tag($tagname, $attributes = array(), $content = false, $force_open = false)
 	{
 		$attributes = self::build_html_attributes($attributes);
 		
@@ -328,7 +328,7 @@ class Fishy_FormHelper
 			return "<$tagname $attributes>";
 		}
 		
-		if ($content !== null) {
+		if ($content !== false) {
 			return "<$tagname $attributes>$content</$tagname>";
 		} else {
 			return "<$tagname $attributes />";
