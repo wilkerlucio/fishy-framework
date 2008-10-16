@@ -153,7 +153,7 @@ class Fishy_ArPagination
 		if ($page < 1) {
 			$page = 1;
 		} elseif ($page > $pages) {
-			$page = $pages;
+			$page = max($pages, 1);
 		}
 		
 		return $page;
