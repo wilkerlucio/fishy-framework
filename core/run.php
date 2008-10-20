@@ -32,6 +32,9 @@ define('FISHY_INDEX_PAGE', $conf->index_page);
 //some simple usefull helpers functions
 require_once FISHY_SYSTEM_CORE_PATH . '/core_helpers.php';
 
+//disable magic quotes
+include_once FISHY_SYSTEM_CORE_PATH . '/magic_quotes.php';
+
 //load database
 require_once FISHY_SYSTEM_DATABASE_PATH . '/ActiveRecord.php';
 
