@@ -47,7 +47,8 @@ class Fishy_StringHelper
 		return $bit == $needle;
 	}
 	
-	public static function camelize($name) {
+	public static function camelize($name)
+	{
 		$name = strtolower($name);
 		$normalized = "";
 		
@@ -60,5 +61,33 @@ class Fishy_StringHelper
 		}
 		
 		return $normalized;
+	}
+	
+	/**
+	 * Gives a normalized string that can be used at urls
+	 *
+	 * @param string $string The string to be converted
+	 * @return string Converted string
+	 */
+	public static function normalize($string)
+	{
+		//first, set all to lowercase
+		$string = strtolower($string);
+		
+		//convert spaces into dashes
+		$string = str_replace(' ', '-', $string);
+		
+		//remove out of range characters
+		$out = '';
+		
+		for ($i = 0; $i < strlen($string); $i++) { 
+			if (ord($string[$i]) > 127) {
+				continue;
+			}
+			
+			$out .= $string[$i];
+		}
+		
+		return $out;
 	}
 }
