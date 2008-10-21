@@ -8,6 +8,7 @@ define('FISHY_DB_PATH', FISHY_ROOT_PATH . '/db');
 define('FISHY_LOG_PATH', FISHY_ROOT_PATH . '/log');
 define('FISHY_PUBLIC_PATH', FISHY_ROOT_PATH . '/public');
 define('FISHY_TMP_PATH', FISHY_ROOT_PATH . '/tmp');
+define('FISHY_UPLOAD_PATH', FISHY_ROOT_PATH . '/upload');
 define('FISHY_VENDOR_PATH', FISHY_ROOT_PATH . '/vendor');
 
 define('FISHY_CONTROLLERS_PATH', FISHY_APP_PATH . '/controllers');
