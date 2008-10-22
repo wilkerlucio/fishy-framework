@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../libraries/Inflector.php');
+require_once(dirname(__FILE__) . '/FieldAct.php');
 require_once(dirname(__FILE__) . '/Validators.php');
 require_once(dirname(__FILE__) . '/DbCommand.php');
 require_once(dirname(__FILE__) . '/TableDescriptor.php');
@@ -24,6 +25,7 @@ abstract class ActiveRecord
 	private $_errors;
 	private $_scopes;
 	private $_scopes_enabled;
+	private $_field_act;
 	
 	/**
 	 * Creates a new record
@@ -40,6 +42,7 @@ abstract class ActiveRecord
 		$this->_errors = array();
 		$this->_scopes = array();
 		$this->_scopes_enabled = array();
+		$this->_field_act = array();
 		
 		$this->initialize_fields();
 		$this->fill($params);
@@ -123,10 +126,19 @@ abstract class ActiveRecord
 	 **/
 	protected function initialize_fields()
 	{
+		$autospecial_fields = array(
+			'created_at' => 'datetime',
+			'updated_at' => 'datetime'
+		);
+		
 		$fields = $this->fields();
 		
 		foreach ($fields as $field) {
 			$this->_attributes[$field] = null;
+			
+			if (isset($autospecial_fields[$field])) {
+				$this->register_field_as($autospecial_fields[$field], array($field));
+			}
 		}
 	}
 	
@@ -697,6 +709,15 @@ abstract class ActiveRecord
 			return $this->primary_key_value();
 		}
 		
+		//chech for field act command
+		if (isset($this->_field_act[$attribute])) {
+			$data = $this->_field_act[$attribute];
+			
+			if ($data[0] & FIELD_ACT_GET) {
+				return FieldAct::get($data[1], $data[2]);
+			}
+		}
+		
 		//check for named scope
 		if (isset($this->_scopes[$attribute])) {
 			return $this->append_scope($attribute);
@@ -722,6 +743,15 @@ abstract class ActiveRecord
 	 */
 	public function __set($attribute, $value)
 	{
+		//chech for field act command
+		if (isset($this->_field_act[$attribute])) {
+			$data = $this->_field_act[$attribute];
+			
+			if ($data[0] & FIELD_ACT_SET) {
+				$this->write_attribute($attribute, FieldAct::set($data[1], $data[2]));
+			}
+		}
+		
 		//check for method accessor
 		if (method_exists($this, 'set_' . $attribute)) {
 			call_user_func(array($this, 'set_' . $attribute), $value);
@@ -741,9 +771,29 @@ abstract class ActiveRecord
 	 */
 	public function __call($name, $arguments)
 	{
+		//chech for field act command
+		if (isset($this->_field_act[$name])) {
+			$data = $this->_field_act[$name];
+			
+			if ($data[0] & FIELD_ACT_CALL) {
+				$args = $data[2];
+				
+				foreach ($arguments as $arg) {
+					$args[] = $arg;
+				}
+				
+				return FieldAct::call($data[1], $args);
+			}
+		}
+		
 		//try to catch validator assign
 		if (substr($name, 0, 9) == 'validates') {
 			return $this->register_validator($name, $arguments);
+		}
+		
+		//try to catch field act assign
+		if (substr($name, 0, 9) == 'field_as_') {
+			return $this->register_field_as(substr($name, 9), $arguments);
 		}
 		
 		//try to catch dynamic find
@@ -1024,6 +1074,19 @@ abstract class ActiveRecord
 		$scoped->_scopes_enabled[] = $scope;
 		
 		return $scoped;
+	}
+	
+	//Field act helpers
+	
+	protected function register_field_as($name, $arguments)
+	{
+		$field = $arguments[0];
+		
+		array_unshift($arguments, $this);
+		
+		$formats = FieldAct::formats($name);
+		
+		$this->_field_act[$field] = array($formats, $name, $arguments);
 	}
 	
 	//Tree Helpers
