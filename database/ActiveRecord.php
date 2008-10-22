@@ -687,12 +687,12 @@ abstract class ActiveRecord
 		}
 	}
 	
-	protected function read_attribute($attribute)
+	public function read_attribute($attribute)
 	{
 		return isset($this->_attributes[$attribute]) ? $this->_attributes[$attribute] : null;
 	}
 	
-	protected function write_attribute($attribute, $value)
+	public function write_attribute($attribute, $value)
 	{
 		$this->_attributes[$attribute] = $value;
 	}
