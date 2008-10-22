@@ -18,10 +18,6 @@
 
 //this script changes the way of PHP handle multiple file uploads, read documentation for details
 
-echo '<pre>';
-
-var_dump($_FILES);
-
 foreach ($_FILES as $key => $file) {
 	//test against any file attribute
 	if (is_array($file['name'])) {
@@ -36,6 +32,3 @@ foreach ($_FILES as $key => $file) {
 		$_FILES[$key] = $transformed;
 	}
 }
-
-var_dump($_FILES);
-//die();
