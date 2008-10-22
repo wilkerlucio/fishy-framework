@@ -101,6 +101,13 @@ class Fishy_FormHelper
 		return self::text_field($field, $options, $html_options);
 	}
 	
+	public static function file_field($field, $options = array(), $html_options = array())
+	{
+		$html_options = array_merge(array('type' => 'file', 'value' => ''), $html_options);
+		
+		return self::text_field($field, $options, $html_options);
+	}
+	
 	public static function relational_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
