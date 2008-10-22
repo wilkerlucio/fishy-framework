@@ -30,5 +30,17 @@ foreach ($_FILES as $key => $file) {
 		}
 		
 		$_FILES[$key] = $transformed;
+		
+		//TODO: make a descente array merge
+		
+		if (!isset($_POST[$key])) {
+			$_POST[$key] = array();
+		}
+		
+		foreach ($transformed as $name => $item) {
+			$_POST[$key][$name] = $item;
+		}
+	} else {
+		$_POST[$key] = $file;
 	}
 }
