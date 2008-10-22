@@ -1,7 +1,5 @@
 <?php
 
-//TODO: cache behaviour
-
 //set some system definitios
 define('FISHY_SYSTEM_CLASS_PREFIX', 'Fishy_');
 
@@ -34,6 +32,9 @@ require_once FISHY_SYSTEM_CORE_PATH . '/core_helpers.php';
 
 //disable magic quotes
 include_once FISHY_SYSTEM_CORE_PATH . '/magic_quotes.php';
+
+//transform upload format
+include_once FISHY_SYSTEM_CORE_PATH . '/upload_transform.php';
 
 //load database
 require_once FISHY_SYSTEM_DATABASE_PATH . '/ActiveRecord.php';
