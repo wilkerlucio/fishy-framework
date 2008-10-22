@@ -57,6 +57,7 @@ require_once FISHY_SYSTEM_DATABASE_PATH . '/ActiveRecord.php';
 
 $db_conf = include FISHY_CONFIG_PATH . '/db.php';
 
+FieldAct::set_upload_path(FISHY_UPLOAD_PATH . '/');
 DBCommand::configure($db_conf->host, $db_conf->user, $db_conf->password, $db_conf->database);
 
 //run!

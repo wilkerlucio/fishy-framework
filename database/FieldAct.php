@@ -22,9 +22,41 @@ define('FIELD_ACT_CALL', 4);
 
 class FieldAct
 {
+	private static $upload_base_dir = './';
+	
+	public static function set_upload_path($path)
+	{
+		self::$upload_base_dir = $path;
+	}
+	
 	private static function _set_file($object, $field, $value)
 	{
+		if(!$value['tmp_name']) {
+			return;
+		}
 		
+		$dir = self::$upload_base_dir;
+		
+		$bits = array(date('Y'), date('m'), date('d'));
+		
+		foreach ($bits as $part) {
+			$dir .= $part . '/';
+			
+			if (!is_dir($dir)) {
+				mkdir($dir);
+			}
+		}
+		
+		$new_path = $dir . uniqid() . '.' . $value['name'];
+		
+		move_uploaded_file($value['tmp_name'], $new_path);
+		
+		//remove previous file
+		if (is_file($object->$field)) {
+			unlink($object->$field);
+		}
+		
+		return $new_path;
 	}
 	
 	private static function _call_datetime($object, $field, $format = '%m/%d/%Y')

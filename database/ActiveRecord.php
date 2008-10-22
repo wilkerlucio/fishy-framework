@@ -764,11 +764,18 @@ abstract class ActiveRecord
 			$data = $this->_field_act[$attribute];
 			$args = $data[2];
 			
+			$obj = array_shift($args);
+			$field = array_shift($args);
+			
 			array_unshift($args, $value);
+			array_unshift($args, $field);
+			array_unshift($args, $obj);
 			
 			if ($data[0] & FIELD_ACT_SET) {
 				$this->write_attribute($attribute, FieldAct::set($data[1], $args));
 			}
+			
+			return;
 		}
 		
 		//check for method accessor
