@@ -746,9 +746,12 @@ abstract class ActiveRecord
 		//chech for field act command
 		if (isset($this->_field_act[$attribute])) {
 			$data = $this->_field_act[$attribute];
+			$args = $data[2];
+			
+			array_unshift($args, $value);
 			
 			if ($data[0] & FIELD_ACT_SET) {
-				$this->write_attribute($attribute, FieldAct::set($data[1], $data[2]));
+				$this->write_attribute($attribute, FieldAct::set($data[1], $args));
 			}
 		}
 		
