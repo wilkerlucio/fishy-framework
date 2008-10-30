@@ -107,7 +107,8 @@ abstract class Fishy_Controller
 	{
 		return array(
 			'return' => false,
-			'controller' => $this->classname()
+			'controller' => $this->classname(),
+			'as' => null
 		);
 	}
 	
@@ -160,11 +161,17 @@ abstract class Fishy_Controller
 	{
 		$options = array_merge($this->render_options(), $options);
 		
+		if ($options['as'] === null) {
+			$options['as'] = $partial;
+		}
+		
 		ob_start();
 		
 		$view_path = $this->view_path("_$partial", $options['controller']);
 		
 		if (file_exists($view_path)) {
+			$$options['as'] = $data;
+			
 			include $view_path;
 		}
 		
@@ -185,12 +192,15 @@ abstract class Fishy_Controller
 	 * @param $return If you pass true to this parameter, the output will be returned instead of printed
 	 * @return mixed
 	 */
-	protected function render_collection($partial, $collection, $return = false)
+	protected function render_collection($partial, $collection, $options = array())
 	{
 		$output = array();
+		$options = array_merge($this->render_options(), $options);
+		$return = $options['return'];
+		$options['return'] = true;
 		
 		foreach ($collection as $data) {
-			$output[] = $this->render_partial($partial, $data, array('return' => true));
+			$output[] = $this->render_partial($partial, $data, $options);
 		}
 		
 		$output = implode('', $output);
