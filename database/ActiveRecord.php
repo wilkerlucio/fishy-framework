@@ -186,7 +186,8 @@ abstract class ActiveRecord
 			'offset'     => false,
 			'select'     => '*',
 			'from'       => '`' . $this->table() . '`',
-			'groupby'    => ''
+			'groupby'    => '',
+			'joins'      => array()
 		), $options);
 		
 		switch ($what) {
@@ -385,12 +386,34 @@ abstract class ActiveRecord
 		$sql  = "SELECT {$options['select']} ";
 		$sql .= "FROM {$options['from']} ";
 		
+		$this->add_joins($sql, $options['joins']);
 		$this->add_conditions($sql, $options['conditions']);
 		$this->add_groupby($sql, $options['groupby']);
 		$this->add_order($sql, $options['order']);
 		$this->add_limit($sql, $options['limit'], $options['offset']);
 		
 		return $sql;
+	}
+	
+	private function add_joins(&$sql, $joins)
+	{
+		if (is_array($joins)) {
+			$cur_table = $this->table();
+			$cur_key = $this->primary_key();
+			$cur_fk = strtolower(get_class($this)) . '_id';
+			
+			foreach ($joins as $join) {
+				$model = ActiveRecord::model($join);
+				
+				$join_table = $model->table();
+				$join_key = $model->primary_key();
+				$join_fk = strtolower(get_class($model)) . '_id';
+				
+				$sql .= "INNER JOIN `{$join_table}` ON `{$join_table}`.`{$cur_fk}` = `{$cur_table}`.`{$cur_key}` ";
+			}
+		} elseif (is_string($joins)) {
+			$sql .= $joins . " ";
+		}
 	}
 	
 	private function add_conditions(&$sql, $conditions)
