@@ -106,4 +106,24 @@ class Fishy_StringHelper
 		
 		return $out;
 	}
+	
+	/**
+	 * Generates a random string
+	 *
+	 * @param integer $length The length of generated string
+	 * @param string $charset The charset to be used
+	 * @return string The string generated
+	 */
+	public static function random($length, $charset = 'abcdefghijklmnopqrstuvxywzABCDEFGHIJKLMNOPQRSTUVXYWZ0123456789')
+	{
+		$out = "";
+		
+		for ($i = 0; $i < $length; $i++) { 
+			$index = rand(0, strlen($charset) - 1);
+			
+			$out .= $charset[$index];
+		}
+		
+		return $out;
+	}
 }
