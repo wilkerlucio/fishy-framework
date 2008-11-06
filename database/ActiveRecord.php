@@ -131,7 +131,20 @@ abstract class ActiveRecord
 	 **/
 	public function table()
 	{
-		return strtolower(Inflect::pluralize(get_class($this)));
+		$class = get_class($this);
+		$table = $class[0];
+		
+		for ($i = 1; $i < strlen($class); $i++) { 
+			$char = $class[$i];
+			
+			if (ord($char) > 64 && ord($char) < 91) {
+				$table .= '_' + strtolower($char);
+			} else {
+				$table .= $char;
+			}
+		}
+		
+		return strtolower(Inflect::pluralize($table));
 	}
 	
 	/**
