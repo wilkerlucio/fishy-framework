@@ -30,7 +30,8 @@ class ActiveRecord_Validators
 		'invalid_number' => 'The field %s is not a number',
 		'not_unique' => 'The field %s with value %s is already exists, try another value',
 		'invalid_list' => 'The field %s needs to be one of these values: %s (currently: %s)',
-		'invalid_format' => 'The field %s doesn\'t match with a needed format'
+		'invalid_format' => 'The field %s doesn\'t match with a needed format',
+		'invalid_confirmation' => 'The field %s is not equal to %s'
 	);
 	
 	/**
@@ -41,10 +42,10 @@ class ActiveRecord_Validators
 	 * @return boolean
 	 * @author wilker
 	 */
-	public static function validates_presence_of($object, $field)
+	public static function validates_presence_of($object, $field, $err = null)
 	{
 		if (!$object->$field) {
-			$object->add_error($field, sprintf(self::$validations_messages['nonblank'], $field));
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['nonblank'], $field));
 			return false;
 		}
 		
@@ -58,10 +59,10 @@ class ActiveRecord_Validators
 	 * @param string $field Field to test
 	 * @return boolean
 	 */
-	public static function validates_email_of($object, $field)
+	public static function validates_email_of($object, $field, $err = null)
 	{
 		if (!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $object->$field)) {
-			$object->add_error($field, sprintf(self::$validations_messages['invalid_email'], $field));
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_email'], $field));
 			return false;
 		}
 		
@@ -76,10 +77,10 @@ class ActiveRecord_Validators
 	 * @return boolean
 	 * @author wilker
 	 */
-	public static function validates_numericality_of($object, $field)
+	public static function validates_numericality_of($object, $field, $err = null)
 	{
 		if (!is_numeric($object->$field)) {
-			$object->add_error($field, sprintf(self::$validations_messages['invalid_number'], $field));
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_number'], $field));
 			return false;
 		}
 		
@@ -92,8 +93,13 @@ class ActiveRecord_Validators
 	 * @return void
 	 * @author wilker
 	 */
-	public static function validates_confirmation_of($object, $field)
+	public static function validates_confirmation_of($object, $field, $field2, $err = null)
 	{
+		if ($object->$field != $object->$field2) {
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_confirmation'], $field, $field2));
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -104,12 +110,12 @@ class ActiveRecord_Validators
 	 * @param string $field Field to test
 	 * @return void
 	 */
-	public static function validates_uniqueness_of($object, $field)
+	public static function validates_uniqueness_of($object, $field, $err = null)
 	{
-		$n = $object->count(array('conditions' => array($field => $object->$field)));
+		$record = $object->first(array('conditions' => array($field => $object->$field)));
 		
-		if ($n > 0) {
-			$object->add_error($field, sprintf(self::$validations_messages['not_unique'], $field, $object->$field));
+		if ($record && $record->id != $object->id) {
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['not_unique'], $field, $object->$field));
 			return false;
 		}
 		
@@ -124,10 +130,10 @@ class ActiveRecord_Validators
 	 * @param string $format Expression to be evaluated
 	 * @return void
 	 */
-	public static function validates_format_of($object, $field, $format)
+	public static function validates_format_of($object, $field, $format, $err = null)
 	{
 		if (!preg_match($format, $object->$field)) {
-			$object->add_error($field, sprintf(self::$validations_messages['invalid_format'], $field));
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_format'], $field));
 			return false;
 		}
 		
@@ -142,10 +148,10 @@ class ActiveRecord_Validators
 	 * @param string $format List of valid values
 	 * @return void
 	 */
-	public static function validates_inclusion_of($object, $field, $list)
+	public static function validates_inclusion_of($object, $field, $list, $err = null)
 	{
 		if (!in_array($object->$field, $list)) {
-			$object->add_error($field, sprintf(self::$validations_messages['invalid_list'], $field, join(', ', $list), $object->$field));
+			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_list'], $field, join(', ', $list), $object->$field));
 			return false;
 		}
 		
