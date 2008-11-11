@@ -24,6 +24,8 @@ abstract class Fishy_Controller
 	protected $_render_layout;
 	protected $_layout;
 	protected $_page_cache;
+	protected $_cycle;
+	protected $_cycle_it;
 	
 	public final function __construct()
 	{
@@ -32,6 +34,8 @@ abstract class Fishy_Controller
 		$this->_render_layout = true;
 		$this->_page_cache = false;
 		$this->_layout = $this->classname();
+		$this->_cycle = array();
+		$this->_cycle_it = 0;
 		
 		$this->initialize();
 	}
@@ -303,6 +307,24 @@ abstract class Fishy_Controller
 	protected function sp($propertie, $default = null)
 	{
 		return isset($_SESSION[$propertie]) ? $_SESSION[$propertie] : $default;
+	}
+	
+	protected function cycle()
+	{
+		$args = func_get_args();
+		
+		if ($args !== $this->_cycle) {
+			$this->_cycle = $args;
+			$this->_cycle_it = 0;
+		} else {
+			$this->_cycle_it++;
+			
+			if ($this->_cycle_it >= count($this->_cycle)) {
+				$this->_cycle_it = 0;
+			}
+		}
+		
+		return $this->_cycle[$this->_cycle_it];
 	}
 	
 	/**
