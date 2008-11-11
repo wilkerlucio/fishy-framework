@@ -35,4 +35,30 @@ class Fishy_DirectoryHelper
 			}
 		}
 	}
+	
+	public static function rmdir($path)
+	{
+		if (!is_dir($path)) {
+			return;
+		}
+		
+		$path = trim($path, '/');
+		$path = trim($path, '\\');
+		$handler = opendir($path);
+		
+		while ($file = readdir($handler)) {
+			if ($file == '.' || $file == '..') continue;
+			
+			$cur = $path . '/' . $file;
+			
+			if (is_dir($cur)) {
+				rmdir($cur);
+			} else {
+				unlink($cur);
+			}
+		}
+		
+		closedir($handler);
+		rmdir($path);
+	}
 }
