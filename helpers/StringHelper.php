@@ -126,4 +126,15 @@ class Fishy_StringHelper
 		
 		return $out;
 	}
+	
+	public static function zero_fill($string, $n)
+	{
+		$string = $string . '';
+		
+		while(strlen($string) < $n) {
+			$string = '0' . $string;
+		}
+		
+		return $string;
+	}
 }
