@@ -32,7 +32,7 @@ class FieldAct
 	private static function _set_file($object, $field, $value)
 	{
 		if(!$value['tmp_name']) {
-			return;
+			return $object->$field;
 		}
 		
 		$dir = self::$upload_base_dir;
