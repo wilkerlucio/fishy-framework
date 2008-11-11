@@ -131,20 +131,20 @@ abstract class ActiveRecord
 	 **/
 	public function table()
 	{
-		$class = get_class($this);
+		$class = Inflect::pluralize(get_class($this));
 		$table = $class[0];
 		
 		for ($i = 1; $i < strlen($class); $i++) { 
 			$char = $class[$i];
 			
 			if (ord($char) > 64 && ord($char) < 91) {
-				$table .= '_' + strtolower($char);
+				$table .= '_' . strtolower($char);
 			} else {
 				$table .= $char;
 			}
 		}
 		
-		return strtolower(Inflect::pluralize($table));
+		return strtolower($table);
 	}
 	
 	/**
@@ -723,6 +723,11 @@ abstract class ActiveRecord
 		}
 	}
 	
+	public function read_all_attributes()
+	{
+		return $this->_attributes;
+	}
+	
 	public function read_attribute($attribute)
 	{
 		return isset($this->_attributes[$attribute]) ? $this->_attributes[$attribute] : null;
@@ -833,6 +838,9 @@ abstract class ActiveRecord
 	 */
 	public function __call($name, $arguments)
 	{
+		//for use in preg matches
+		$matches = array();
+		
 		//chech for field act command
 		if (isset($this->_field_act[$name])) {
 			$data = $this->_field_act[$name];
@@ -848,6 +856,13 @@ abstract class ActiveRecord
 			}
 		}
 		
+		//do a get
+		if (preg_match('/^get_(.+)/', $name, $matches)) {
+			$var_name = $matches[1];
+			
+			return $this->$var_name ? $this->$var_name : $arguments[0];
+		}
+		
 		//try to catch validator assign
 		if (substr($name, 0, 9) == 'validates') {
 			return $this->register_validator($name, $arguments);
@@ -859,13 +874,18 @@ abstract class ActiveRecord
 		}
 		
 		//try to catch dynamic find
-		$matches = array();
 		
 		if (preg_match("/^find_(all_by|by)_(.*)/", $name, $matches)) {
 			return $this->dynamic_find($matches[1], $matches[2], $arguments);
 		}
 		
-		throw new Exception("Method $name doesn't exists.");
+		//send to model try to parse
+		$this->call($name, $arguments);
+	}
+	
+	public function call($name)
+	{
+		throw new Exception("Method $name is not found in " . get_class($this));
 	}
 	
 	public function __toString() {
@@ -1022,6 +1042,7 @@ abstract class ActiveRecord
 	private function register_validator($validator, $arguments)
 	{
 		array_unshift($arguments, $this);
+		
 		$this->_validators[] = array($validator, $arguments);
 	}
 	
@@ -1039,8 +1060,8 @@ abstract class ActiveRecord
 	 */
 	public function is_valid()
 	{
-		$valid = $this->validate();
 		$this->_errors = array();
+		$valid = $this->validate();
 		
 		foreach ($this->_validators as $validator) {
 			list($method, $arguments) = $validator;
