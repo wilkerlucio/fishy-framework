@@ -108,6 +108,23 @@ class Fishy_FormHelper
 		return self::text_field($field, $options, $html_options);
 	}
 	
+	public static function checkbox_field($field, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
+		
+		$attr = array('type' => 'checkbox', 'value' => 1);
+		
+		if ($object->$normal) {
+			$attr['checked'] = 'checked';
+		}
+		
+		$html_options = array_merge($attr, $html_options);
+		
+		return self::hidden_field($field, array(), array('value' => '0', 'id' => $fieldid . '_')) . self::text_field($field, $options, $html_options);
+	}
+	
 	public static function relational_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
@@ -158,6 +175,59 @@ class Fishy_FormHelper
 		$out .= "<script type=\"text/javascript\"> Fishy.Util.relational_map('#{$destiny_id}', '#{$hidden_id}') </script>";
 		
 		return $out;
+	}
+	
+	public static function checkbox_group($field, $choices, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldname = self::get_field($field);
+		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
+		
+		$options = array_merge(array(
+			'wrap_into' => '%s',
+			'checked' => null
+		), $options);
+		
+		if ($options['checked'] !== null && !is_array($options['checked'])) {
+			$options['checked'] = array((string) $options['checked']);
+		}
+		
+		$html_options = array_merge(array(
+    		'name' => $fieldname,
+    		'class' => '',
+    		'type' => 'checkbox'
+		), $html_options);
+		
+		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
+			$html_options['class'] .= ' error';
+		}
+		
+		$out = '';
+		
+		foreach ($choices as $value => $name) {
+			$id = "{$fieldid}_{$value}";
+			$attr = array_merge($html_options, array('value' => $value, 'id' => $id));
+			
+			if ($options['checked'] !== null && in_array($value, $options['checked'])) {
+				$attr['checked'] = 'checked';
+			}
+			
+			$out .= sprintf($options['wrap_into'], self::build_tag('input', $attr) . ' ' . self::build_tag('label', array('for' => $id), $name) . ' ');
+		}
+		
+		return $out;
+	}
+	
+	public static function select_num_range($start, $end)
+	{
+		$data = array();
+		
+		for ($i = $start; $i <= $end; $i++) { 
+			$data[$i] = $i;
+		}
+		
+		return $data;
 	}
 	
 	/**
@@ -223,15 +293,17 @@ class Fishy_FormHelper
 		
 		$value = $object->$normal;
 		
-		if (is_array($value)) {
-			$options['selected'] = array();
-			$foreign = isset($options['foreign_value']) ? $options['foreign_value'] : 'id';
-			
-			foreach ($object->$normal as $row) {
-				$options['selected'][] = $row->$foreign;
+		if (!isset($options['selected'])) {
+			if (is_array($value)) {
+				$options['selected'] = array();
+				$foreign = isset($options['foreign_value']) ? $options['foreign_value'] : 'id';
+				
+				foreach ($object->$normal as $row) {
+					$options['selected'][] = $row->$foreign;
+				}
+			} else {
+				$options['selected'] = $object->$normal;
 			}
-		} else {
-			$options['selected'] = $object->$normal;
 		}
 		
 		$choices = array();
