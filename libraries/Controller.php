@@ -112,7 +112,9 @@ abstract class Fishy_Controller
 		return array(
 			'return' => false,
 			'controller' => $this->classname(),
-			'as' => null
+			'as' => null,
+			'layout' => $this->_layout,
+			'locals' => array()
 		);
 	}
 	
@@ -135,7 +137,7 @@ abstract class Fishy_Controller
 		
 		$output = ob_get_clean();
 		
-		$layout = FISHY_VIEWS_PATH . '/layouts/' . $this->_layout . '.php';
+		$layout = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
 		
 		if (file_exists($layout) && $this->_render_layout) {
 			$content = $output;
@@ -174,6 +176,11 @@ abstract class Fishy_Controller
 		$view_path = $this->view_path("_$partial", $options['controller']);
 		
 		if (file_exists($view_path)) {
+			//instance locals
+			foreach ($options['locals'] as $key => $value) {
+				$$key = $value;
+			}
+			
 			$$options['as'] = $data;
 			
 			include $view_path;
