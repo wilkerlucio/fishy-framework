@@ -27,6 +27,10 @@ class Fishy_FormHelper
 	
 	public static function form_for($object, $options = array(), $html_options = array())
 	{
+		$options = array_merge(array(
+			'multipart' => false
+		), $options);
+		
 		array_push(self::$form_stack, $object);
 		
 		$html_options = array_merge(array(
@@ -34,6 +38,10 @@ class Fishy_FormHelper
 			'method' => 'post',
 			'action' => ''
 		), $html_options);
+		
+		if ($options['multipart']) {
+			$html_options['enctype'] = 'multipart/form-data';
+		}
 		
 		return self::build_tag('form', $html_options, null, true);
 	}
