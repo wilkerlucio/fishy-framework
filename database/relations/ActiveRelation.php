@@ -61,7 +61,20 @@ abstract class ActiveRelation
     		return $this->options['foreign_field'];
     	}
     	
-        return strtolower(get_class($model)) . '_id';
+    	$class = get_class($model);
+		$field = $class[0];
+		
+		for ($i = 1; $i < strlen($class); $i++) { 
+			$char = $class[$i];
+			
+			if (ord($char) > 64 && ord($char) < 91) {
+				$field .= '_' . strtolower($char);
+			} else {
+				$field .= $char;
+			}
+		}
+		
+		return strtolower($field) . '_id';
     }
     
     public function get_data($force_refresh = false)
