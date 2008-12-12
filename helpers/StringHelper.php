@@ -107,6 +107,40 @@ class Fishy_StringHelper
 		return $out;
 	}
 	
+	public static function simple_template($template, $vars)
+	{
+		$output = "";
+		$var_reg = "";
+		$mode = 0;
+		
+		for ($i = 0; $i < strlen($template); $i++) {
+			$char = $template[$i];
+			
+			if ($mode == 0) {
+				switch ($char) {
+					case '#':
+						$mode = 1;
+						$var_reg = "";
+						break;
+					default:
+						$output .= $char;
+				}
+			} elseif ($mode == 1) {
+				$code = ord($char);
+				
+				if ($code > 96 && $code < 123) {
+					$var_reg .= $char;
+				} else {
+					$output .= $vars[$var_reg];
+					$output .= $char;
+					$mode = 0;
+				}
+			}
+		}
+		
+		return $output;
+	}
+	
 	/**
 	 * Generates a random string
 	 *
