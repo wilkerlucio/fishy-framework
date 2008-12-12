@@ -334,6 +334,47 @@ abstract class Fishy_Controller
 		return $this->_cycle[$this->_cycle_it];
 	}
 	
+	protected function image_cache($model, $field, $id = null, $configuration = array(), $user_vars = array())
+	{
+		$configuration = array_merge(array(
+			'width' => 100,
+			'height' => 100,
+			'mode' => 1,
+			'format' => 'jpg',
+			'path_format' => '#cache/#model/#field/#id.#width.#height.#mode.#format',
+			'default' => ''
+		), $configuration);
+		
+		$vars = array_merge(array(
+			'cache' => FISHY_CACHE_PATH,
+			'model' => $model,
+			'field' => $field,
+			'id' => $id,
+			'width' => $configuration['width'],
+			'height' => $configuration['height'],
+			'mode' => $configuration['mode'],
+			'format' => $configuration['format']
+		), $user_vars);
+		
+		$path = Fishy_StringHelper::simple_template($configuration['path_format'], $vars);
+		
+		if (!file_exists($path)) {
+			$object = is_a($model, 'ActiveRecord') ? $model : ActiveRecord::model($model)->find($id);
+			
+			if ($object->$field) {
+				Fishy_DirectoryHelper::mkdir($path, true);
+				
+				$image = new Fishy_Image($object->$field);
+				$image->resize($configuration['width'], $configuration['height'], $configuration['mode']);
+				$image->save($path);
+			} else {
+				return $this->public_url($configuration['default']);
+			}
+		}
+		
+		return file_get_contents($path);
+	}
+	
 	/**
 	 * Get a value at data store
 	 *
