@@ -130,6 +130,10 @@ class Fishy_StringHelper
 				
 				if ($code > 96 && $code < 123) {
 					$var_reg .= $char;
+					
+					if ($i == (strlen($template) - 1)) {
+						$output .= $vars[$var_reg];
+					}
 				} else {
 					$output .= $vars[$var_reg];
 					$output .= $char;
