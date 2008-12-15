@@ -47,4 +47,36 @@ class Fishy_ArrayHelper
 			$origin[] = $value;
 		}
 	}
+	
+	public static function array_split($array, $parts)
+	{
+		$count = count($array);
+		
+		$pieces = floor($count / $parts);
+		$rest = $count % $parts;
+		
+		$output = array();
+		$x = 0;
+		
+		for ($i = 0; $i < $parts; $i++) {
+			$segment = array();
+			
+			for ($z = 0; $z < $pieces; $z++) {
+				$segment[] = $array[$x];
+				
+				$x++;
+			}
+			
+			if ($rest > 0) {
+				$segment[] = $array[$x];
+				
+				$rest--;
+				$x++;
+			}
+			
+			$output[] = $segment;
+		}
+		
+		return $output;
+	}
 }
