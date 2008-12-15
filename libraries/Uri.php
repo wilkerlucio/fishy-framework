@@ -18,6 +18,10 @@
 
 class Fishy_Uri {
 	public static function get_querystring($include_get = false) {
+		if (isset($_SERVER['ORIG_PATH_INFO'])) {
+			return trim(@$_SERVER['ORIG_PATH_INFO'], '/');
+		}
+		
 		$script = $_SERVER['SCRIPT_NAME'];
 		$request = $_SERVER['PHP_SELF'];
 		
