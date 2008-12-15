@@ -175,4 +175,13 @@ class Fishy_StringHelper
 		
 		return $string;
 	}
+	
+	public static function force_http($string)
+	{
+		if (!self::starts_with($string, 'http://')) {
+			$string = 'http://' . $string;
+		}
+		
+		return $string;
+	}
 }
