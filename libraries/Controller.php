@@ -44,7 +44,7 @@ abstract class Fishy_Controller
 	
 	public static function build_view_path($controller, $action)
 	{
-		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', $controller) . '/' . $action . '.php';
+		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
 	}
 	
 	protected function classname()
@@ -96,7 +96,7 @@ abstract class Fishy_Controller
 	 * @param $route The route to be executed
 	 * @return void
 	 */
-	public function run($route) {
+	public static function run($route) {
 		$args = explode('/', $route);
 		
 		$controller_name = Fishy_StringHelper::camelize(array_shift($args)) . 'Controller';
@@ -358,18 +358,24 @@ abstract class Fishy_Controller
 		
 		$path = Fishy_StringHelper::simple_template($configuration['path_format'], $vars);
 		
-		if (!file_exists($path)) {
-			$object = is_a($model, 'ActiveRecord') ? $model : ActiveRecord::model($model)->find($id);
-			
-			if ($object->$field) {
-				Fishy_DirectoryHelper::mkdir($path, true);
-				
-				$image = new Fishy_Image($object->$field);
-				$image->resize($configuration['width'], $configuration['height'], $configuration['mode']);
-				$image->save($path);
-			} else {
-				return $this->public_url($configuration['default']);
+		$object = is_a($model, 'ActiveRecord') ? $model : ActiveRecord::model($model)->find($id);
+		
+		if ($object->$field) {
+			if (file_exists($path) && filemtime($object->$field) > filemtime($path)) {
+				unlink($path);
 			}
+			
+			if (!file_exists($path)) {
+				if ($object->$field) {
+					Fishy_DirectoryHelper::mkdir($path, true);
+					
+					$image = new Fishy_Image($object->$field);
+					$image->resize($configuration['width'], $configuration['height'], $configuration['mode']);
+					$image->save($path);
+				}
+			}
+		} else {
+			$this->redirect_to('public/' . $configuration['default']);
 		}
 		
 		return file_get_contents($path);
