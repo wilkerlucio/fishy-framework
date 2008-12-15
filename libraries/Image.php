@@ -64,7 +64,7 @@ class Fishy_Image {
      * @param $bgcolor Background color to fill when using resize mode 2
      * @return void
      */
-    public function resize($new_width, $new_height, $mode = 0, $bgcolor = '#000000') {
+    public function resize($new_width, $new_height, $mode = 0, $bgcolor = '#FFFFFF') {
         if ($new_width == 0) {
             $new_width = $new_height * $this->aspect_y;
         }
@@ -206,9 +206,9 @@ class Fishy_Image {
         }
         
         return imagecolorallocate($image,
-            hexdec(substr($bgcolor, 1, 2)),
-            hexdec(substr($bgcolor, 3, 2)),
-            hexdec(substr($bgcolor, 5, 2))
+            hexdec(substr($color, 1, 2)),
+            hexdec(substr($color, 3, 2)),
+            hexdec(substr($color, 5, 2))
         );
     }
     
