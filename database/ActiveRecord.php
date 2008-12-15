@@ -74,6 +74,8 @@ abstract class ActiveRecord
 	 */
 	public static function model($model_name)
 	{
+		$model_name = ucfirst($model_name);
+		
 		$modelcache = ModelCache::get_instance();
 		
 		return @$modelcache->$model_name;
