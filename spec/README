@@ -1,0 +1,13 @@
+To run the specs you need to install PHPSpec framework into your PHP Environment
+
+To install PHPSpec you need PEAR installed, after install pear follow these instructions into your console (don't type sudo if you are running on Windows):
+
+1. sudo pear upgrade PEAR
+2. sudo pear channel-discover pear.phpspec.org
+3. sudo pear install phpspec/PHPSpec
+
+If all occur correctly you are now able to run the specs, go to spec folder of Fishy Framework into your console and run the following command:
+
+phpspec -r
+
+This will run all the tests
