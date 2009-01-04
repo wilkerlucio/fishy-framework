@@ -38,7 +38,7 @@ class Fishy_ArrayHelper
 			}
 		}
 		
-		return false;
+		return -1;
 	}
 	
 	public static function array_push(&$origin, $data)
