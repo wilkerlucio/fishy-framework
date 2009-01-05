@@ -361,7 +361,7 @@ abstract class Fishy_Controller
 		$object = is_a($model, 'ActiveRecord') ? $model : ActiveRecord::model($model)->find($id);
 		
 		if ($object->$field) {
-			if (file_exists($path) && filemtime($object->$field) > filemtime($path)) {
+			if (file_exists($path) && file_exists($object->$field) && filemtime($object->$field) > filemtime($path)) {
 				unlink($path);
 			}
 			
