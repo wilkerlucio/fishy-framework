@@ -126,6 +126,17 @@ class Fishy_ArPagination
 		
 		return $wrapper;
 	}
+	
+	/**
+	 * Get a link to a page
+	 *
+	 * @param integer $page The number of page
+	 * @return string
+	 */
+	public function link_to_page($page)
+	{
+		return $this->config['base_url'] . $page;
+	}
 
 	/**
 	 * Set a configuration option
@@ -188,6 +199,56 @@ class Fishy_ArPagination
 		
 		return $this->model->all($query);
 	}
+	
+	/**
+	 * Get the number of pages
+	 *
+	 * @return integer Number of pages
+	 */
+	public function get_total_pages()
+	{
+		return ceil($this->get_total() / $this->per_page);
+	}
+	
+	/**
+	 * Test if there is a previous page
+	 *
+	 * @return boolean
+	 */
+	public function has_prev()
+	{
+		return $this->get_cur_page() > 1;
+	}
+	
+	/**
+	 * Test if there is a next page
+	 *
+	 * @return boolean
+	 */
+	public function has_next()
+	{
+		return $this->get_cur_page() < $this->get_total_pages();
+	}
+	
+	/**
+	 * Get a link to the previous page
+	 *
+	 * @return string
+	 */
+	public function prev_link()
+	{
+		return $this->link_to_page($this->get_cur_page() - 1);
+	}
+	
+	/**
+	 * Get a link to the next page
+	 *
+	 * @return string
+	 */
+	public function next_link()
+	{
+		return $this->link_to_page($this->get_cur_page() + 1);
+	}
 
 	/**
 	 * Generate and return the links to navigation
@@ -197,7 +258,7 @@ class Fishy_ArPagination
 	public function create_links()
 	{
 		$total = $this->get_total();
-		$pages = ceil($total / $this->per_page);
+		$pages = $this->get_total_pages();
 		$cur_page = $this->get_cur_page();
 		
 		$page_range = ($this->config['num_links'] - 1) / 2;
@@ -219,7 +280,7 @@ class Fishy_ArPagination
 		
 		$links .= $this->config['full_tag_open'];
 		
-		if ($cur_page > 1) {
+		if ($this->has_prev()) {
 			if ($this->config['first_link']) $links .= $this->make_wrap(1, 'first');
 			if ($this->config['prev_link']) $links .= $this->make_wrap($cur_page - 1, 'prev');
 		} else {
@@ -237,7 +298,7 @@ class Fishy_ArPagination
 			$links .= $i < $page_end ? $this->config['num_separator'] : '';
 		}
 		
-		if ($cur_page < $pages) {
+		if ($this->has_next()) {
 			if ($this->config['next_link']) $links .= $this->make_wrap($cur_page + 1, 'next');
 			if ($this->config['last_link']) $links .= $this->make_wrap($pages, 'last');
 		} else {
