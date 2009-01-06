@@ -52,7 +52,7 @@ class Fishy_DirectoryHelper
 			$cur = $path . '/' . $file;
 			
 			if (is_dir($cur)) {
-				rmdir($cur);
+				self::rmdir($cur);
 			} else {
 				unlink($cur);
 			}
