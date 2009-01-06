@@ -16,11 +16,22 @@
  * limitations under the License. 
  */
 
+/**
+ * This class provides a simple interface to work with zip files
+ *
+ * @version 1.0.0
+ * @author Wilker Lucio <wilkerlucio@gmail.com>
+ */
 class Fishy_Zip
 {
 	private $ref;
 	private $content_data;
 	
+	/**
+	 * Creates a new zip file and load basic data of contents
+	 *
+	 * @param string $path The path of zip file to open
+	 */
 	public function __construct($path)
 	{
 		if (!is_file($path)) {
@@ -66,6 +77,11 @@ class Fishy_Zip
 		return false;
 	}
 	
+	/**
+	 * Get a list with all files contained into zip file
+	 *
+	 * @return array A list with all files contained into zip
+	 */
 	public function list_of_files()
 	{
 		$files = array();
@@ -79,6 +95,14 @@ class Fishy_Zip
 		return $files;
 	}
 	
+	/**
+	 * Extract a single file from zip
+	 *
+	 * @param string $file the name of file to be extract
+	 * @param string $to path to extract the file (default current path)
+	 *
+	 * @return boolean true if file is found, false otherwise
+	 */
 	public function extract($file, $to = '.')
 	{
 		$to = trim($to, '/');
@@ -94,6 +118,11 @@ class Fishy_Zip
 		return false;
 	}
 	
+	/**
+	 * Extract all files of zip
+	 *
+	 * @param string $path path to extract files (default current path)
+	 */
 	public function extract_all($path = '.')
 	{
 		$path = trim($path, '/');
@@ -107,6 +136,9 @@ class Fishy_Zip
 		}
 	}
 	
+	/**
+	 * Close zip handler
+	 */
 	public function close()
 	{
 		zip_close($this->ref);
