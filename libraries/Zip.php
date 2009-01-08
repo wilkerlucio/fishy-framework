@@ -16,6 +16,9 @@
  * limitations under the License. 
  */
 
+define("FISHY_ZIP_FILE", 1);
+define("FISHY_ZIP_DIRECTORY", 2);
+
 /**
  * This class provides a simple interface to work with zip files
  *
@@ -58,7 +61,7 @@ class Fishy_Zip
 			
 			$name = $item["name"];
 			
-			$item["type"] = $name[strlen($name) - 1] == '/' ? 'folder' : 'file';
+			$item["type"] = $name[strlen($name) - 1] == '/' ? FISHY_ZIP_DIRECTORY : FISHY_ZIP_FILE;
 			
 			$data[] = $item;
 		}
@@ -87,7 +90,7 @@ class Fishy_Zip
 		$files = array();
 		
 		foreach ($this->content_data as $entry) {
-			if ($entry["type"] == "file") {
+			if ($entry["type"] == FISHY_ZIP_FILE) {
 				$files[] = $entry["name"];
 			}
 		}
@@ -128,7 +131,7 @@ class Fishy_Zip
 		$path = trim($path, '/');
 		
 		foreach ($this->content_data as $entry) {
-			if ($entry["type"] == "file") {
+			if ($entry["type"] == FISHY_ZIP_FILE) {
 				file_put_contents($path . '/' . $entry["name"], zip_entry_read($entry["ref"]));
 			} else {
 				mkdir($path . '/' . $entry["name"]);
