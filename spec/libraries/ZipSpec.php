@@ -61,6 +61,7 @@ class DescribeZip extends PHPSpec_Context
 		$zip->extract($file);
 		
 		$this->spec(file_exists($file))->should->beTrue();
+		$this->spec(filesize($file))->should->be(27);
 		
 		unlink($file);
 	}
