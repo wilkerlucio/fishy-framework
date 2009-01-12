@@ -56,7 +56,7 @@ class Fishy_Router
 		}
 		
 		if (!$found) {
-			throw new Exception('Route not found');
+			throw new Fishy_RouterException('Route not found');
 		}
 		
 		foreach ($data as $key => $value) {
@@ -207,3 +207,5 @@ class Fishy_Router
 		return implode('/', $path);
 	}
 }
+
+class Fishy_RouterException extends Exception {}
