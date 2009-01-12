@@ -24,6 +24,8 @@ class RouteSpec extends Fishy_Router
 	{
 		$this->map_connect(':controller/:action/:id');
 		$this->map_connect(':controller/:action/:id.:format');
+		$this->map_connect(':controller/:action');
+		$this->map_connect(':controller/:action.:format');
 	}
 }
 
@@ -43,11 +45,18 @@ class DescribeRouter extends PHPSpec_Context
 	{
 		$router = new RouteSpec();
 		
+		$info = $router->match('main/view');
+		
+		$this->spec($info['controller'])->should->be('main');
+		$this->spec($info['action'])->should->be('view');
+		$this->spec($info['format'])->should->be('html');
+		
 		$info = $router->match('main/view/1');
 		
 		$this->spec($info['controller'])->should->be('main');
 		$this->spec($info['action'])->should->be('view');
 		$this->spec($info['format'])->should->be('html');
+		$this->spec($info['params']['id'])->should->be('1');
 		
 		$info = $router->match('main/view/1.js');
 		
