@@ -43,7 +43,7 @@ class Fishy_Router
 	{
 		$info = array(
 			'controller' => null,
-			'action' => null,
+			'action' => $this->default_action(),
 			'format' => 'html',
 			'params' => array()
 		);
