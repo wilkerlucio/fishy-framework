@@ -29,13 +29,13 @@ include_once FISHY_SYSTEM_CORE_PATH . '/autoloader.php';
 $current_uri = Fishy_Uri::get_querystring();
 
 //load router configuration
-$router_conf = include FISHY_CONFIG_PATH . '/router.php';
+$router_conf = require_once FISHY_CONFIG_PATH . '/router.php';
 
-$ROUTER = new Fishy_Router($router_conf->get_data());
-$current_route = $ROUTER->parse($current_uri);
+$ROUTER = new UserRouter();
+$current_route = $ROUTER->match($current_uri);
 
 //check for cache
-Fishy_Cache::page_cache($current_route);
+Fishy_Cache::page_cache($current_uri);
 
 //load configuration basics
 $conf = include FISHY_CONFIG_PATH . '/config.php';

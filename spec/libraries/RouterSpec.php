@@ -24,6 +24,8 @@ class RouteSpec extends Fishy_Router
 	{
 		$this->map_cart('cart/view/:id', array("controller" => "cart", "action" => "see"));
 		$this->map_connect('shop/:id', array("controller" => "cart"));
+		$this->map_connect('post/:day/:month/:year', array("controller" => "post", "action" => "view", "conditions" => array("day" => "/\d{2}/", "month" => "/\d{2}/", "year" => "/\d{4}/")));
+		$this->map_connect('post/:a/:b/:c', array("controller" => "post", "action" => "other"));
 		$this->map_connect(':controller/:action/:id');
 		$this->map_connect(':controller/:action/:id.:format');
 		$this->map_connect(':controller/:action');
@@ -70,6 +72,22 @@ class DescribeRouter extends PHPSpec_Context
 		
 		$this->spec($info['controller'])->should->be('cart');
 		$this->spec($info['action'])->should->be('see');
+		
+		$info = $router->match('post/12/01/1988');
+		
+		$this->spec($info['controller'])->should->be('post');
+		$this->spec($info['action'])->should->be('view');
+		$this->spec($info['params']['day'])->should->be('12');
+		$this->spec($info['params']['month'])->should->be('01');
+		$this->spec($info['params']['year'])->should->be('1988');
+		
+		$info = $router->match('post/12/name/1988');
+		
+		$this->spec($info['controller'])->should->be('post');
+		$this->spec($info['action'])->should->be('other');
+		$this->spec($info['params']['a'])->should->be('12');
+		$this->spec($info['params']['b'])->should->be('name');
+		$this->spec($info['params']['c'])->should->be('1988');
 	}
 	
 	public function itShouldApplyADefaultActionIfNoGivenOne()
@@ -94,9 +112,9 @@ class DescribeRouter extends PHPSpec_Context
 	{
 		$router = new RouteSpec();
 		
-		//$this->spec($router->discovery_route('cart', 'index', array("id" => "30")))->should->be('shop/30');
+		$this->spec($router->discovery_route('cart', 'index', array("id" => "30")))->should->be('shop/30');
 		$this->spec($router->discovery_route('main', 'index'))->should->be('main/index');
-		//$this->spec($router->discovery_route('cart', 'see', array("id" => "30")))->should->be('cart/view/30');
-		//$this->spec($router->discovery_route('main', 'index', array("id" => "20", "format" => "js")))->should->be('main/index/20.js');
+		$this->spec($router->discovery_route('cart', 'see', array("id" => "30")))->should->be('cart/view/30');
+		$this->spec($router->discovery_route('main', 'index', array("id" => "20", "format" => "js")))->should->be('main/index/20.js');
 	}
 }

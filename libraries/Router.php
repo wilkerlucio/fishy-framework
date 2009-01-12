@@ -72,9 +72,20 @@ class Fishy_Router
 					}
 				}
 				
-				$found = true;
+				$conditions_ok = true;
 				
-				break;
+				foreach ($route['options']['conditions'] as $field => $condition) {
+					if (!preg_match($condition, $data[$field])) {
+						$conditions_ok = false;
+						break;
+					}
+				}
+				
+				if ($conditions_ok) {
+					$found = true;
+					
+					break;
+				}
 			}
 		}
 		
@@ -230,17 +241,27 @@ class Fishy_Router
 			//check if can solve action
 			if (in_array('action', $route['names'])) {
 				$params['action'] = $action;
-			} elseif ($route['options']['action'] != $action) {
+			} else {
+				if (!$route['options']['action']) {
+					$route['options']['action'] = $this->default_action();
+				}
+				
+				if ($route['options']['action'] != $action) {
+					continue;
+				}
+			}
+			
+			if (count($params) != count($route['names'])) {
 				continue;
 			}
 			
 			$solve = true;
 			
 			//check if can solve params
-			foreach ($params as $param) {
-				if ($param == 'controller' || $param == 'action') continue;
+			foreach ($params as $key => $param) {
+				if ($key == 'controller' || $key == 'action') continue;
 				
-				if (!isset($route['defaults'][$param]) && !in_array($param, $route['names'])) {
+				if (!in_array($key, $route['names'])) {
 					$solve = false;
 					break;
 				}

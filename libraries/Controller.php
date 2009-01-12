@@ -26,6 +26,7 @@ abstract class Fishy_Controller
 	protected $_page_cache;
 	protected $_cycle;
 	protected $_cycle_it;
+	public $params;
 	
 	public final function __construct()
 	{
@@ -36,6 +37,7 @@ abstract class Fishy_Controller
 		$this->_layout = $this->classname();
 		$this->_cycle = array();
 		$this->_cycle_it = 0;
+		$this->params = array_merge($_GET, $_POST);
 		
 		$this->initialize();
 	}
@@ -97,14 +99,13 @@ abstract class Fishy_Controller
 	 * @return void
 	 */
 	public static function run($route) {
-		$args = explode('/', $route);
-		
-		$controller_name = Fishy_StringHelper::camelize(array_shift($args)) . 'Controller';
-		$method = strtolower(array_shift($args));
+		$controller_name = Fishy_StringHelper::camelize($route['controller']) . 'Controller';
+		$method = strtolower($route['action']);
 		
 		$controller = new $controller_name();
 		$controller->_current_route = $route;
-		$controller->execute($method, $args);
+		$controller->params = array_merge($controller->params, $route['params']);
+		$controller->execute($method);
 	}
 	
 	protected function render_options()
@@ -379,6 +380,25 @@ abstract class Fishy_Controller
 		}
 		
 		return file_get_contents($path);
+	}
+	
+	public function url_to($params)
+	{
+		global $ROUTER;
+		
+		$params = array_merge(array("controller" => $this->classname()), $params);
+		
+		if (!isset($params['action'])) {
+			throw new Exception("You must especify the action to get url");
+		}
+		
+		$controller = $params['controller'];
+		$action = $params['action'];
+		
+		unset($params['controller']);
+		unset($params['action']);
+		
+		return $this->site_url($ROUTER->discovery_route($controller, $action, $params));
 	}
 	
 	/**
