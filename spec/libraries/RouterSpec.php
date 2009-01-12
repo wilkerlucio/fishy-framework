@@ -22,6 +22,7 @@ class RouteSpec extends Fishy_Router
 {
 	protected function setup()
 	{
+		$this->map_connect('shop/:id', array("controller" => "cart"));
 		$this->map_connect(':controller/:action/:id');
 		$this->map_connect(':controller/:action/:id.:format');
 		$this->map_connect(':controller/:action');
@@ -63,5 +64,16 @@ class DescribeRouter extends PHPSpec_Context
 		$this->spec($info['controller'])->should->be('main');
 		$this->spec($info['action'])->should->be('view');
 		$this->spec($info['format'])->should->be('js');
+	}
+	
+	public function itShouldApplyADefaultActionIfNoGivenOne()
+	{
+		$router = new RouteSpec();
+		
+		$info = $router->match('main/view');
+		
+		$this->spec($info['controller'])->should->be('main');
+		$this->spec($info['action'])->should->be('view');
+		$this->spec($info['format'])->should->be('html');
 	}
 }

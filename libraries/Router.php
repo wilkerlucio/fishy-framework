@@ -53,10 +53,23 @@ class Fishy_Router
 		foreach ($this->routes as $route) {
 			$matches = array();
 			$data = array();
+			$pattern = $route['match_pattern'];
 			
-			if (preg_match($route['match_pattern'], $path, $matches)) {
+			if (preg_match($pattern, $path, $matches)) {
 				foreach ($route['names'] as $key => $name) {
 					$data[$name] = $matches[$key + 1];
+				}
+				
+				foreach (array('controller', 'action') as $key => $value) {
+					if ($route['options'][$key]) {
+						$data[$key] = $value;
+					}
+				}
+				
+				foreach ($route['options']['defaults'] as $key => $value) {
+					if (!isset($data[$key])) {
+						$data[$key] = $value;
+					}
 				}
 				
 				$found = true;
@@ -189,7 +202,7 @@ class Fishy_Router
 			'name' => null,
 			'conditions' => array(),
 			'defaults' => array(),
-			'format' => 'html'
+			'namespace' => null
 		);
 	}
 }
