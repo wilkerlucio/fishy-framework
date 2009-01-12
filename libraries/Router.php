@@ -27,8 +27,18 @@ class Fishy_Router
 		$this->setup();
 	}
 	
+	/**
+	 * Override this method to apply your maps
+	 */
 	protected function setup() {}
 	
+	/**
+	 * Try to match a given path into router rules
+	 *
+	 * @param string $path The path to be matched
+	 *
+	 * @return array Array with result information
+	 */
 	public function match($path)
 	{
 		$info = array(
@@ -81,11 +91,23 @@ class Fishy_Router
 		return $char;
 	}
 	
+	/**
+	 * Default action to be used
+	 *
+	 * @return string
+	 */
 	public function default_action()
 	{
 		return 'index';
 	}
 	
+	/**
+	 * Create a router rule
+	 *
+	 * @param string $pattern The pattern of rule
+	 * @param array $options Options of rule definition
+	 * @return void
+	 */
 	public function map_connect($pattern, $options = array())
 	{
 		$options = array_merge($this->default_options(), $options);
@@ -102,6 +124,12 @@ class Fishy_Router
 		$this->routes[] = $route;
 	}
 	
+	/**
+	 * Evaluate a match pattern
+	 *
+	 * @param string $pattern Pattern to be evaluated
+	 * @return array Data of evaluation
+	 */
 	public function create_match_pattern($pattern)
 	{
 		$var_buffer = '';
