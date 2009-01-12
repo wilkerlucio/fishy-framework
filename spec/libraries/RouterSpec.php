@@ -82,4 +82,21 @@ class DescribeRouter extends PHPSpec_Context
 		$this->spec($info['action'])->should->be('index');
 		$this->spec($info['format'])->should->be('html');
 	}
+	
+	public function itShouldGenerateANamedRoute()
+	{
+		$router = new RouteSpec();
+		
+		$this->spec($router->named_route('cart', array("id" => 20)))->should->be('cart/view/20');
+	}
+	
+	public function itShouldDiscoveryACorrectRouteForParams()
+	{
+		$router = new RouteSpec();
+		
+		//$this->spec($router->discovery_route('cart', 'index', array("id" => "30")))->should->be('shop/30');
+		$this->spec($router->discovery_route('main', 'index'))->should->be('main/index');
+		//$this->spec($router->discovery_route('cart', 'see', array("id" => "30")))->should->be('cart/view/30');
+		//$this->spec($router->discovery_route('main', 'index', array("id" => "20", "format" => "js")))->should->be('main/index/20.js');
+	}
 }

@@ -189,6 +189,111 @@ class Fishy_Router
 		return array("pattern" => $match_pattern, "names" => $names);
 	}
 	
+	/**
+	 * Generate a route based in your name
+	 *
+	 * @param string $name The name of route to be generated
+	 * @param array $params The params to create route
+	 * @return string The generated route
+	 */
+	public function named_route($name, $params = array())
+	{
+		foreach ($this->routes as $route) {
+			if ($route['name'] == $name) {
+				return $this->apply_route($route['pattern'], $params);
+			}
+		}
+		
+		throw new Fishy_RouterException("Named route $name not found");
+	}
+	
+	/**
+	 * Discovery a route for certain parameters
+	 *
+	 * @param string $controller Controller name
+	 * @param string $action Action name
+	 * @param array $params The params
+	 * @return string The discovered route
+	 */
+	public function discovery_route($controller, $action, $req_params = array())
+	{
+		foreach ($this->routes as $route) {
+			$params = $req_params;
+			
+			//check if can solve controller
+			if (in_array('controller', $route['names'])) {
+				$params['controller'] = $controller;
+			} elseif ($route['options']['controller'] != $controller) {
+				continue;
+			}
+			
+			//check if can solve action
+			if (in_array('action', $route['names'])) {
+				$params['action'] = $action;
+			} elseif ($route['options']['action'] != $action) {
+				continue;
+			}
+			
+			$solve = true;
+			
+			//check if can solve params
+			foreach ($params as $param) {
+				if ($param == 'controller' || $param == 'action') continue;
+				
+				if (!isset($route['defaults'][$param]) && !in_array($param, $route['names'])) {
+					$solve = false;
+					break;
+				}
+			}
+			
+			if ($solve) {
+				return $this->apply_route($route['pattern'], $params);
+			}
+		}
+		
+		throw new Fishy_RouterException("The requested route can't be discovery");
+	}
+	
+	private function apply_route($pattern, $params)
+	{
+		$var_buffer = '';
+		$cur = 0;
+		$max = strlen($pattern);
+		$state = 0;
+		$output = '';
+		
+		while ($cur < $max) {
+			$char = $pattern[$cur];
+			
+			if ($state == 0) {
+				if ($char == ':') {
+					$var_buffer = '';
+					$state = 1;
+				} else {
+					$output .= $char;
+				}
+			} elseif ($state == 1) {
+				$code = ord($char);
+				
+				if ($char == '_' || ($code > 96 && $code < 123)) {
+					$var_buffer .= $char;
+				} else {
+					$output .= $params[$var_buffer];
+					$output .= $char;
+					$state = 0;
+				}
+			}
+			
+			$cur++;
+		}
+		
+		if ($state == 1) {
+			$output .= $params[$var_buffer];
+		}
+		
+		return $output;
+	}
+	
 	public function __call($method, $args)
 	{
 		if (substr($method, 0, 4) == 'map_') {
