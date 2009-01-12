@@ -164,48 +164,6 @@ class Fishy_Router
 			'format' => 'html'
 		);
 	}
-	
-	public function parse($path)
-	{
-		foreach ($this->routes as $route) {
-			list($search, $replace) = $route;
-			$matches = array();
-			
-			if (preg_match('/' . $search . '/i', $path, $matches)) {
-				$path = '';
-				
-				for ($i = 0; $i < strlen($replace); $i++) {
-					if ($replace[$i] == '$') {
-						$i++;
-						
-						if ($replace[$i] == '$') {
-							$path .= '$';
-						} else {
-							$path .= $matches[$replace[$i]];
-						}
-					} else {
-						$path .= $replace[$i];
-					}
-				}
-				
-				break;
-			}
-		}
-		
-		$path = trim($path, '/');
-		
-		if (!$path) {
-			$path = $this->config['default_controller'];
-		}
-		
-		$path = explode('/', $path);
-		
-		if (count($path) < 2) {
-			$path[] = $this->config['default_action'];
-		}
-		
-		return implode('/', $path);
-	}
 }
 
 class Fishy_RouterException extends Exception {}
