@@ -60,9 +60,9 @@ class Fishy_Router
 					$data[$name] = $matches[$key + 1];
 				}
 				
-				foreach (array('controller', 'action') as $key => $value) {
-					if ($route['options'][$key]) {
-						$data[$key] = $value;
+				foreach (array('controller', 'action') as $value) {
+					if ($route['options'][$value]) {
+						$data[$value] = $route['options'][$value];
 					}
 				}
 				
@@ -191,7 +191,23 @@ class Fishy_Router
 	
 	public function __call($method, $args)
 	{
-		//TODO: implement a easy way to created named routes
+		if (substr($method, 0, 4) == 'map_') {
+			$name = substr($method, 4);
+			
+			$pattern = $args[0];
+			
+			if (count($args) > 1) {
+				$options = $args[1];
+			} else {
+				$options = array();
+			}
+			
+			$options['name'] = $name;
+			
+			return $this->map_connect($pattern, $options);
+		}
+		
+		throw new Exception('Method not found');
 	}
 	
 	private function default_options()
