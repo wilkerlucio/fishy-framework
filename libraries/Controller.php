@@ -238,7 +238,7 @@ abstract class Fishy_Controller
 	 */
 	protected function redirect_to($path)
 	{
-		header('Location: ' . $this->site_url($path));
+		header('Location: ' . $this->url_to($path));
 		exit;
 	}
 	
@@ -392,19 +392,27 @@ abstract class Fishy_Controller
 	{
 		global $ROUTER;
 		
-		$params = array_merge(array("controller" => $this->classname()), $params);
+		$route = "";
 		
-		if (!isset($params['action'])) {
-			$params['action'] = $ROUTER->default_action();
+		if (is_array($params)) {
+			$params = array_merge(array("controller" => $this->classname()), $params);
+			
+			if (!isset($params['action'])) {
+				$params['action'] = $ROUTER->default_action();
+			}
+			
+			$controller = $params['controller'];
+			$action = $params['action'];
+			
+			unset($params['controller']);
+			unset($params['action']);
+			
+			$route = $ROUTER->discovery_route($controller, $action, $params);
+		} else {
+			$route = $params;
 		}
 		
-		$controller = $params['controller'];
-		$action = $params['action'];
-		
-		unset($params['controller']);
-		unset($params['action']);
-		
-		return FISHY_BASE_URL . FISHY_INDEX_PAGE . $ROUTER->discovery_route($controller, $action, $params);
+		return FISHY_BASE_URL . FISHY_INDEX_PAGE . $route;
 	}
 	
 	/**
@@ -436,7 +444,13 @@ abstract class Fishy_Controller
 		if (Fishy_StringHelper::ends_with($method, '_url')) {
 			$route_name = substr($method, 0, -4);
 			
-			return FISHY_BASE_URL . FISHY_INDEX_PAGE . $ROUTER->named_route($route_name, $args[0]);
+			return FISHY_BASE_URL . FISHY_INDEX_PAGE . $ROUTER->named_route($route_name, @$args[0]);
+		}
+		
+		if (Fishy_StringHelper::starts_with($method, 'redirect_to_')) {
+			$route_name = substr($method, strlen('redirect_to_'));
+			
+			return $this->redirect_to($ROUTER->named_route($route_name, @$args[0]));
 		}
 		
 		throw new Exception("Method $method doesn't exists");

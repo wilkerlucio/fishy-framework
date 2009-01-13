@@ -82,6 +82,11 @@ class Fishy_Router
 				}
 				
 				if ($conditions_ok) {
+					//apply namespace if given
+					if ($route['options']['namespace']) {
+						$data['controller'] = $route['options']['namespace'] . '_' . $data['controller'];
+					}
+					
 					$found = true;
 					
 					break;
@@ -230,11 +235,20 @@ class Fishy_Router
 	{
 		foreach ($this->routes as $route) {
 			$params = $req_params;
+			$con = $controller;
+			
+			if ($route['options']['namespace']) {
+				if (Fishy_StringHelper::starts_with($con, $route['options']['namespace'])) {
+					$con = substr($con, strlen($route['options']['namespace']) + 1);
+				} else {
+					continue;
+				}
+			}
 			
 			//check if can solve controller
 			if (in_array('controller', $route['names'])) {
-				$params['controller'] = $controller;
-			} elseif ($route['options']['controller'] != $controller) {
+				$params['controller'] = $con;
+			} elseif ($route['options']['controller'] != $con) {
 				continue;
 			}
 			
