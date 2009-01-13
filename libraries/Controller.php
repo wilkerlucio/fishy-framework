@@ -49,9 +49,15 @@ abstract class Fishy_Controller
 		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
 	}
 	
-	protected function classname()
+	protected function classname($lowercase = true)
 	{
-		return strtolower(substr(get_class($this), 0, -strlen('Controller')));
+		$name = substr(get_class($this), 0, -strlen('Controller'));
+		
+		if ($lowercase) {
+			$name = strtolower($name);
+		}
+		
+		return $name;
 	}
 	
 	protected function view_path($action, $controller = null)
