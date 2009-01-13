@@ -422,4 +422,17 @@ abstract class Fishy_Controller
 	{
 		$this->_data[$propertie] = $value;
 	}
+	
+	protected function __call($method, $args)
+	{
+		global $ROUTER;
+		
+		if (Fishy_StringHelper::ends_with($method, '_url')) {
+			$route_name = substr($method, 0, -4);
+			
+			return FISHY_BASE_URL . FISHY_INDEX_PAGE . $ROUTER->named_route($route_name, $args[0]);
+		}
+		
+		throw new Exception("Method $method doesn't exists");
+	}
 }
