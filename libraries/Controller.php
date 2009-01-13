@@ -382,7 +382,7 @@ abstract class Fishy_Controller
 		return file_get_contents($path);
 	}
 	
-	public function url_to($params)
+	protected function url_to($params)
 	{
 		global $ROUTER;
 		
@@ -398,7 +398,7 @@ abstract class Fishy_Controller
 		unset($params['controller']);
 		unset($params['action']);
 		
-		return $this->site_url($ROUTER->discovery_route($controller, $action, $params));
+		return FISHY_BASE_URL . FISHY_INDEX_PAGE . $ROUTER->discovery_route($controller, $action, $params);
 	}
 	
 	/**
