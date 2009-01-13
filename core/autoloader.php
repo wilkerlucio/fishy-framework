@@ -70,6 +70,27 @@ function fishy_autoloader($classname)
 		}
 	}
 	
+	//try to load user helper
+	if (Fishy_StringHelper::ends_with($classname, 'Helper')) {
+		$path = FISHY_HELPERS_PATH;
+		
+		$bits = explode('_', $classname);
+		
+		while (count($bits) > 1) {
+			$path .= '/' . strtolower(array_shift($bits));
+		}
+		
+		$path .= '/' . array_shift($bits) . '.php';
+		
+		if (file_exists($path)) {
+			require_once $path;
+			
+			if (class_exists($classname)) {
+				return true;
+			}
+		}
+	}
+	
 	//try to load model
 	$path = FISHY_MODELS_PATH . '/' . $classname . '.php';
 	
