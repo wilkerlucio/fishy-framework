@@ -389,7 +389,7 @@ abstract class Fishy_Controller
 		$params = array_merge(array("controller" => $this->classname()), $params);
 		
 		if (!isset($params['action'])) {
-			throw new Exception("You must especify the action to get url");
+			$params['action'] = $ROUTER->default_action();
 		}
 		
 		$controller = $params['controller'];
