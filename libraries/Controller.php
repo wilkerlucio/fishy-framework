@@ -26,7 +26,7 @@ abstract class Fishy_Controller
 	protected $_page_cache;
 	protected $_cycle;
 	protected $_cycle_it;
-	public $params;
+	protected $_params;
 	
 	public final function __construct()
 	{
@@ -37,7 +37,7 @@ abstract class Fishy_Controller
 		$this->_layout = $this->classname();
 		$this->_cycle = array();
 		$this->_cycle_it = 0;
-		$this->params = array_merge($_GET, $_POST);
+		$this->_params = array_merge($_GET, $_POST);
 		
 		$this->initialize();
 	}
@@ -110,7 +110,7 @@ abstract class Fishy_Controller
 		
 		$controller = new $controller_name();
 		$controller->_current_route = $route;
-		$controller->params = array_merge($controller->params, $route['params']);
+		$controller->_params = array_merge($controller->_params, $route['params']);
 		$controller->execute($method);
 	}
 	
@@ -413,6 +413,18 @@ abstract class Fishy_Controller
 		}
 		
 		return FISHY_BASE_URL . FISHY_INDEX_PAGE . $route;
+	}
+	
+	/**
+	 * Get a request param
+	 *
+	 * @param string $name The name of parameter
+	 * @param mixed $default The default value
+	 * @return mixed
+	 */
+	protected function param($name, $default = null)
+	{
+		return isset($this->_params[$name]) ? $this->_params[$name] : $default;
 	}
 	
 	/**
