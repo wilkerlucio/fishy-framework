@@ -97,11 +97,11 @@ class Fishy_StringHelper
 		$out = '';
 		
 		for ($i = 0; $i < strlen($string); $i++) { 
-			if (ord($string[$i]) > 127) {
-				continue;
-			}
+			$c = ord($string[$i]);
 			
-			$out .= $string[$i];
+			if ($c == 45 || ($c > 47 && $c < 58) || ($c > 96 && $c < 123)) {
+				$out .= $string[$i];
+			}
 		}
 		
 		return $out;
