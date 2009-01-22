@@ -176,8 +176,8 @@ class Fishy_FormHelper
 		$out .= self::hidden_field($field, array(), array('value' => $hidden_value));
 		$out .= self::select_for_model($field . '_source', $filter, $options['value_field'], $options['id_field'], array(), $common_html);
 		$out .= "<br /><br />";
-		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$source_id}', '#{$destiny_id}')"), $button_html), 'Adicionar');
-		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$destiny_id}', '#{$source_id}')"), $button_html), 'Remover');
+		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$source_id}', '#{$destiny_id}')"), $button_html), 'Adicionar &darr;');
+		$out .= self::build_tag('button', array_merge(array('onclick' => "Fishy.Util.move_options('#{$destiny_id}', '#{$source_id}')"), $button_html), 'Remover &uarr;');
 		$out .= "<br /><br />";
 		$out .= self::select_for_model($field . '_destiny', $object->$normal, $options['value_field'], $options['id_field'], array(), $common_html);
 		$out .= "<script type=\"text/javascript\"> Fishy.Util.relational_map('#{$destiny_id}', '#{$hidden_id}') </script>";
