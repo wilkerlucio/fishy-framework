@@ -67,4 +67,15 @@ class DescribeArrayHelper extends PHPSpec_Context
 		$this->spec(count($splited[2]))->should->be(7);
 		$this->spec(count($splited[3]))->should->be(7);
 	}
+	
+	public function itShouldFindIndexOfElement()
+	{
+		$haystack = array("a", "b", "c", "d");
+		
+		$this->spec(Fishy_ArrayHelper::index_of($haystack, "a"))->should->be(0);
+		$this->spec(Fishy_ArrayHelper::index_of($haystack, "b"))->should->be(1);
+		$this->spec(Fishy_ArrayHelper::index_of($haystack, "c"))->should->be(2);
+		$this->spec(Fishy_ArrayHelper::index_of($haystack, "d"))->should->be(3);
+		$this->spec(Fishy_ArrayHelper::index_of($haystack, "e"))->should->be(-1);
+	}
 }

@@ -79,4 +79,22 @@ class Fishy_ArrayHelper
 		
 		return $output;
 	}
+	
+	/**
+	 * Find the index of element into array
+	 *
+	 * @param array $haystack The array to find element
+	 * @param mixed $needle The element to be found
+	 * @return integer Return the index of element or -1 if the element isn't present
+	 */
+	public static function index_of($haystack, $needle)
+	{
+		foreach ($haystack as $key => $value) {
+			if ($needle == $value) {
+				return $key;
+			}
+		}
+		
+		return -1;
+	}
 }
