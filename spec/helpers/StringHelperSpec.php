@@ -47,7 +47,7 @@ class DescribeStringHelper extends PHPSpec_Context
 	
 	public function itShouldNormalizeStringToUrlSafeOne()
 	{
-		$this->spec(Fishy_StringHelper::normalize("Hi i'm to be normalized"))->should->be("hi-i'm-to-be-normalized");
+		$this->spec(Fishy_StringHelper::normalize("Hi i'm to be normalized"))->should->be("hi-im-to-be-normalized");
 	}
 	
 	public function itShouldApplyVariablesIntoSimpleTemplate()
