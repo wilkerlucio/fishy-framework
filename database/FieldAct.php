@@ -36,18 +36,7 @@ class FieldAct
 		}
 		
 		$dir = self::$upload_base_dir;
-		
-		$bits = array(date('Y'), date('m'), date('d'));
-		
-		foreach ($bits as $part) {
-			$dir .= $part . '/';
-			
-			if (!is_dir($dir)) {
-				mkdir($dir);
-			}
-		}
-		
-		$new_path = $dir . uniqid() . '.' . $value['name'];
+		$new_path = $dir . self::create_uniq_path($dir, $value['name']);
 		
 		move_uploaded_file($value['tmp_name'], $new_path);
 		
@@ -57,6 +46,62 @@ class FieldAct
 		}
 		
 		return $new_path;
+	}
+	
+	private static function _set_image($object, $field, $value, $configuration = array())
+	{
+		if(!$value['tmp_name']) {
+			return $object->$field;
+		}
+		
+		$dir = FISHY_PUBLIC_PATH . '/uploads/';
+		
+		if (!is_dir($dir)) {
+			mkdir($dir);
+		}
+		
+		$rel_path = self::create_uniq_path($dir, $value['name']);
+		$new_path = $dir . $rel_path;
+		
+		try {
+			//resize
+			$image = new Fishy_Image($value['tmp_name']);
+			self::apply_image_conf($image, $configuration);
+			$image->save($new_path);
+			
+			//remove previous file
+			if (is_file($dir . $object->$field)) {
+				unlink($dir . $object->$field);
+			}
+		} catch(Exception $e) {
+			return $object->$field;
+		}
+		
+		return $rel_path;
+	}
+	
+	private static function apply_image_conf(&$image, $config)
+	{
+		$config = array_merge(array('width' => 0, 'height' => 0, 'mode' => 0), $config);
+		
+		$image->resize($config['width'], $config['height'], $config['mode']);
+	}
+	
+	private static function create_uniq_path($dir, $name)
+	{
+		$bits = array(date('Y'), date('m'), date('d'));
+		$current = "";
+		
+		foreach ($bits as $part) {
+			$dir .= $part . '/';
+			$current .= $part . '/';
+			
+			if (!is_dir($dir)) {
+				mkdir($dir);
+			}
+		}
+		
+		return $current . uniqid() . '.' . $name;
 	}
 	
 	private static function _call_datetime($object, $field, $format = '%m/%d/%Y')
