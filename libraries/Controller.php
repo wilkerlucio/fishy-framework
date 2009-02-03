@@ -428,6 +428,25 @@ abstract class Fishy_Controller
 	}
 	
 	/**
+	 * Display a Javascript alert and then redirect user to another page
+	 * Note: this method only works with client javascript enabled,
+	 *       don't use it if you are not sure that your client will be
+	 *       with javascript enabled
+	 *
+	 * @param string $message Message to display for client
+	 * @param mixed $redirect_to String or Array with path to use in redirect
+	 */
+	protected function show_message_and_redirect_to($message, $redirect_to)
+	{
+		$message = preg_replace('/(\r\n|\r|\n)/', '\\n', $message);
+		
+		$this->_render = false;
+		$url = $this->url_to($redirect_to);
+		
+		echo "<script type=\"text/javascript\"> alert('{$message}'); location.href = '{$url}'; </script>";
+	}
+	
+	/**
 	 * Get a value at data store
 	 *
 	 * @param $propertie The name o propertie
