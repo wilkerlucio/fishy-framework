@@ -60,11 +60,29 @@ class Fishy_Image {
      *
      * @param $new_width The new width of image (use 0 with a valid height to calcular proportional)
      * @param $new_height The new height of image (use 0 with a valid width to calcular proportional)
-     * @param $mode The mode of resize, 0 to normal resize, 1 to resize with crop, 2 to resize by reduction (and fill the blank with bgcolor given in fourth parameter)
+     * @param $mode The mode of resize:
+     *                - 0 to normal resize
+     *                - 1 to resize with crop
+     *                - 2 to resize by reduction (and fill the blank with bgcolor given in fourth parameter)
+     *                - 3 to resize using width/height as constraints (use to keep a max width/height without crop os distorce)
      * @param $bgcolor Background color to fill when using resize mode 2
      * @return void
      */
     public function resize($new_width, $new_height, $mode = 0, $bgcolor = '#FFFFFF') {
+        if ($mode == 3) {
+            if ($new_width < 1 || $new_height < 1) {
+                throw new Fishy_Image_Exception("Argument error: to use resize mode 3 you should specify the width and height of resize");
+            }
+            
+            $resize_constraint = $new_height / $new_width;
+            
+            if ($this->aspect_x > $resize_constraint) {
+                $new_width = 0;
+            } else {
+                $new_height = 0;
+            }
+        }
+        
         if ($new_width == 0) {
             $new_width = $new_height * $this->aspect_y;
         }
