@@ -64,7 +64,7 @@ class Fishy_Image {
      *                - 0 to normal resize
      *                - 1 to resize with crop
      *                - 2 to resize by reduction (and fill the blank with bgcolor given in fourth parameter)
-     *                - 3 to resize using width/height as constraints (use to keep a max width/height without crop os distorce)
+     *                - 3 to resize using width/height as constraints (use to keep a max width/height without crop or distorce)
      * @param $bgcolor Background color to fill when using resize mode 2
      * @param $grow Determine if the image haves to grow, if you pass false the image only will be resized if new size is smaller than original size
      * @return boolean True if image was resized, false otherwise
