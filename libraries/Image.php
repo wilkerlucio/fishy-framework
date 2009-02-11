@@ -66,9 +66,10 @@ class Fishy_Image {
      *                - 2 to resize by reduction (and fill the blank with bgcolor given in fourth parameter)
      *                - 3 to resize using width/height as constraints (use to keep a max width/height without crop os distorce)
      * @param $bgcolor Background color to fill when using resize mode 2
-     * @return void
+     * @param $grow Determine if the image haves to grow, if you pass false the image only will be resized if new size is smaller than original size
+     * @return boolean True if image was resized, false otherwise
      */
-    public function resize($new_width, $new_height, $mode = 0, $bgcolor = '#FFFFFF') {
+    public function resize($new_width, $new_height, $mode = 0, $bgcolor = '#FFFFFF', $grow = true) {
         if ($mode == 3) {
             if ($new_width < 1 || $new_height < 1) {
                 throw new Fishy_Image_Exception("Argument error: to use resize mode 3 you should specify the width and height of resize");
@@ -89,6 +90,12 @@ class Fishy_Image {
         
         if ($new_height == 0) {
             $new_height = $new_width * $this->aspect_x;
+        }
+        
+        if (!$grow) {
+            if ($this->width < $new_width || $this->height < $new_height) {
+                return false;
+            }
         }
         
         $src_x = $src_y = $dst_x = $dst_y = 0;
@@ -128,6 +135,8 @@ class Fishy_Image {
         
         $this->image = $resized;
         $this->prepare_data($this->image, true);
+        
+        return true;
     }
     
     /**
