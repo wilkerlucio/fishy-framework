@@ -78,4 +78,23 @@ class DescribeArrayHelper extends PHPSpec_Context
 		$this->spec(Fishy_ArrayHelper::index_of($haystack, "d"))->should->be(3);
 		$this->spec(Fishy_ArrayHelper::index_of($haystack, "e"))->should->be(-1);
 	}
+	
+	public function itShouldGroupArraysIntoSubArrays()
+	{
+		$data = range(1, 10);
+		
+		$grouped = Fishy_ArrayHelper::in_groups_of($data, 5);
+		
+		$this->spec(count($grouped))->should->be(2);
+		$this->spec(count($grouped[0]))->should->be(5);
+		$this->spec(count($grouped[1]))->should->be(5);
+		
+		$grouped = Fishy_ArrayHelper::in_groups_of($data, 3);
+		
+		$this->spec(count($grouped))->should->be(4);
+		$this->spec(count($grouped[0]))->should->be(3);
+		$this->spec(count($grouped[1]))->should->be(3);
+		$this->spec(count($grouped[2]))->should->be(3);
+		$this->spec(count($grouped[3]))->should->be(1);
+	}
 }

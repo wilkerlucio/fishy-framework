@@ -97,4 +97,32 @@ class Fishy_ArrayHelper
 		
 		return -1;
 	}
+	
+	/**
+	 * Group array into subgroups of data
+	 *
+	 * @param array $data The array containg current data
+	 * @param integer $n The number of items per group
+	 * @return array The data grouped
+	 */
+	public static function in_groups_of($data, $n)
+	{
+		$groups = array();
+		$buffer = array();
+		
+		foreach ($data as $item) {
+			$buffer[] = $item;
+			
+			if (count($buffer) == $n) {
+				$groups[] = $buffer;
+				$buffer = array();
+			}
+		}
+		
+		if (count($buffer) > 0) {
+			$groups[] = $buffer;
+		}
+		
+		return $groups;
+	}
 }
