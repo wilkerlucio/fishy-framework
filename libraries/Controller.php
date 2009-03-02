@@ -412,7 +412,11 @@ abstract class Fishy_Controller
 			$route = $params;
 		}
 		
-		return FISHY_BASE_URL . FISHY_INDEX_PAGE . $route;
+		if (!preg_match("/^http:\/\//", $route)) {
+			$route = FISHY_BASE_URL . FISHY_INDEX_PAGE . $route;
+		}
+		
+		return $route;
 	}
 	
 	/**
@@ -443,7 +447,12 @@ abstract class Fishy_Controller
 		$this->_render = false;
 		$url = $this->url_to($redirect_to);
 		
-		echo "<script type=\"text/javascript\"> alert('{$message}'); location.href = '{$url}'; </script>";
+		$template_file = dirname(__FILE__) . '/../misc/show_message_and_redirect_to_template.html';
+		$template_data = array("message" => $message, "url" => $url);
+		
+		$template = file_get_contents($template_file);
+		
+		echo Fishy_StringHelper::simple_template($template, $template_data);
 	}
 	
 	/**
