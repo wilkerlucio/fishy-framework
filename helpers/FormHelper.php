@@ -28,8 +28,11 @@ class Fishy_FormHelper
 	public static function form_for($object, $options = array(), $html_options = array())
 	{
 		$options = array_merge(array(
-			'multipart' => false
+			'multipart' => false,
+			'varname'   => 'data'
 		), $options);
+		
+		$object->__form_var_name = $options['varname'];
 		
 		array_push(self::$form_stack, $object);
 		
@@ -390,7 +393,7 @@ class Fishy_FormHelper
 		} else {
 			$filtred_name = self::get_normalized_field($fieldname);
 			
-			$result = "data[$filtred_name]";
+			$result = "{$object->__form_var_name}[$filtred_name]";
 			
 			if (Fishy_StringHelper::ends_with($fieldname, '[]')) {
 				$result .= '[]';
