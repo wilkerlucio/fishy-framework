@@ -34,9 +34,6 @@ $router_conf = require_once FISHY_CONFIG_PATH . '/router.php';
 $ROUTER = new UserRouter();
 $current_route = $ROUTER->match($current_uri);
 
-//check for cache
-Fishy_Cache::page_cache($current_uri);
-
 //load configuration basics
 $conf = include FISHY_CONFIG_PATH . '/config.php';
 

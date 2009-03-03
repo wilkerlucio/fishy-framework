@@ -94,7 +94,8 @@ abstract class Fishy_Controller
 		
 		if ($this->_page_cache) {
 			$data = ob_get_flush();
-			$file = Fishy_Cache::cache($this->_current_route, $data);
+			
+			$file = Fishy_Cache::cache(Fishy_Uri::get_querystring(), $data);
 		}
 	}
 	
