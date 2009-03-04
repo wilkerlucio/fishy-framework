@@ -27,6 +27,7 @@ abstract class Fishy_Controller
 	protected $_cycle;
 	protected $_cycle_it;
 	protected $_params;
+	protected $_block_cache_stack;
 	
 	public final function __construct()
 	{
@@ -38,6 +39,7 @@ abstract class Fishy_Controller
 		$this->_cycle = array();
 		$this->_cycle_it = 0;
 		$this->_params = array_merge($_GET, $_POST);
+		$this->_block_cache_stack = array();
 		
 		$this->initialize();
 	}
@@ -286,6 +288,46 @@ abstract class Fishy_Controller
 		$this->_page_cache = true;
 		
 		ob_start();
+	}
+	
+	/**
+	 * 
+	 */
+	protected function cache_block($identifier)
+	{
+		$this->_block_cache_stack[] = $identifier;
+		
+		ob_start();
+	}
+	
+	protected function cache_block_end()
+	{
+		$block_content = ob_get_clean();
+		$identifier = array_pop($this->_block_cache_stack);
+		
+		$cache_path = FISHY_CACHE_PATH . "/{$identifier}.block";
+		
+		//check for cache
+		if (file_exists($cache_path)) {
+			echo file_get_contents($cache_path);
+			return;
+		}
+		
+		//generate cache
+		$parsed_block = preg_replace("/<#(.*?)#>/ms", "<?\$1?>", $block_content);
+		
+		$tmp_path = tempnam(FISHY_TMP_PATH, "BC");
+		file_put_contents($tmp_path, $parsed_block);
+		
+		ob_start();
+		include($tmp_path);
+		$cache = ob_get_clean();
+		
+		unlink($tmp_path);
+		
+		file_put_contents($cache_path, $cache);
+		
+		echo $cache;
 	}
 	
 	/**

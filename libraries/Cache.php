@@ -20,7 +20,7 @@ class Fishy_Cache
 {
 	public static function normalize_path($path)
 	{
-		return FISHY_CACHE_PATH . '/' . trim($path, '/') . '.html';
+		return FISHY_CACHE_PATH . '/' . trim($path, '/');
 	}
 	
 	public static function expire($uri)
@@ -38,7 +38,7 @@ class Fishy_Cache
 	
 	public static function cache($route, $data)
 	{
-		$file = self::normalize_path($route);
+		$file = self::normalize_path($route) . '.html';
 		
 		Fishy_DirectoryHelper::mkdir($file, true);
 		
