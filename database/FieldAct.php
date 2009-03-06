@@ -60,31 +60,51 @@ class FieldAct
 			mkdir($dir);
 		}
 		
-		$rel_path = self::create_uniq_path($dir, $value['name']);
+		$rel_path = self::create_uniq_path($dir, pathinfo($value['name'], PATHINFO_FILENAME));
 		$new_path = $dir . $rel_path;
+		$ext = pathinfo($value['name'], PATHINFO_EXTENSION);
 		
-		try {
-			//resize
-			$image = new Fishy_Image($value['tmp_name']);
-			self::apply_image_conf($image, $configuration);
-			$image->save($new_path);
-			
-			//remove previous file
-			if (is_file($dir . $object->$field)) {
-				unlink($dir . $object->$field);
+		foreach ($configuration as $key => $config) {
+			try {
+				//get info
+				list($width, $height, $mode) = explode("x", $config);
+				
+				//resize
+				$image = new Fishy_Image($value['tmp_name']);
+				$image->resize((int) $width, (int) $height, (int) $mode);
+				$image->save("$new_path.$key.$ext");
+				$image->destroy();
+				
+				//remove previous file
+				$old_path = $dir . self::parse_image_path($object->$field, $key);
+				
+				if (is_file($old_path)) {
+					unlink($old_path);
+				}
+			} catch(Exception $e) {
+				throw $e;
+				
+				return $object->$field;
 			}
-		} catch(Exception $e) {
-			return $object->$field;
 		}
 		
-		return $rel_path;
+		return $rel_path . ".*." . $ext;
 	}
 	
-	private static function apply_image_conf(&$image, $config)
+	private static function _call_image($object, $field, $config, $sample = "default")
 	{
-		$config = array_merge(array('width' => 0, 'height' => 0, 'mode' => 0), $config);
+		$base = $object->$field;
 		
-		$image->resize($config['width'], $config['height'], $config['mode']);
+		if ($base) {
+			return self::parse_image_path($base, $sample);
+		} else {
+			return null;
+		}
+	}
+	
+	private static function parse_image_path($path, $key)
+	{
+		return str_replace("*", $key, $path);
 	}
 	
 	private static function create_uniq_path($dir, $name)
