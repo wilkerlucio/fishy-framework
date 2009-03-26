@@ -120,10 +120,11 @@ class Fishy_StringHelper
 	{
 		if (strlen($string) <= $length) return $string;
 		
+		$string = str_replace("\r\n", "\n", $string);
 		$truncated = substr($string, 0, $length - strlen($padding));
 		
 		if ($preserve_words) {
-			while ($string[strlen($truncated)] != ' ') {
+			while (!in_array($string[strlen($truncated)], array(' ', "\n", "\t"))) {
 				$truncated = substr($truncated, 0, strlen($truncated) - 1);
 			}
 		}

@@ -91,6 +91,30 @@ class DescribeStringHelper extends PHPSpec_Context
 		$this->spec($truncated)->should->be("My string is getting to...");
 	}
 	
+	public function itShouldTruncateAStringPreservingWordsWithLineBreak()
+	{
+		$string = "My string is getting to\nlong for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30, true);
+		
+		$this->spec($truncated)->should->be("My string is getting to...");
+	}
+	
+	public function itShouldTruncateAStringPreservingWordsWithWindowsLineBreak()
+	{
+		$string = "My string is getting to\r\nlong for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30, true);
+		
+		$this->spec($truncated)->should->be("My string is getting to...");
+	}
+	
+	public function itShouldTruncateAStringPreservingWordsWithTabulation()
+	{
+		$string = "My string is getting to\tlong for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30, true);
+		
+		$this->spec($truncated)->should->be("My string is getting to...");
+	}
+	
 	public function itShouldNotTruncateTheStringIfTheStringInLesserThanGivenLength()
 	{
 		$string = "Im little";
