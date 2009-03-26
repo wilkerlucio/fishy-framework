@@ -111,10 +111,10 @@ class Fishy_StringHelper
 	 * Truncate a string
 	 * 
 	 * @return string The truncated string
-	 * @param object $string The string to be truncated
-	 * @param object $length The max length of string
-	 * @param object $preserve_words[optional] Pass true if you want to preserve the words of string
-	 * @param object $padding[optional] You can use this to change the default padding string
+	 * @param string $string The string to be truncated
+	 * @param integer $length The max length of string
+	 * @param boolean $preserve_words[optional] Pass true if you want to preserve the words of string
+	 * @param string $padding[optional] You can use this to change the default padding string
 	 */
 	public static function truncate($string, $length, $preserve_words = false, $padding = "...")
 	{
