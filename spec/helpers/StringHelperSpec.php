@@ -74,4 +74,36 @@ class DescribeStringHelper extends PHPSpec_Context
 		$this->spec(Fishy_StringHelper::force_http("yahoo.com"))->should->be("http://yahoo.com");
 		$this->spec(Fishy_StringHelper::force_http("http://www.google.com"))->should->be("http://www.google.com");
 	}
+	
+	public function itShouldTruncateAString()
+	{
+		$string = "My string is getting to long for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30);
+		
+		$this->spec($truncated)->should->be("My string is getting to lon...");
+	}
+	
+	public function itShouldTruncateAStringPreservingWords()
+	{
+		$string = "My string is getting to long for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30, true);
+		
+		$this->spec($truncated)->should->be("My string is getting to...");
+	}
+	
+	public function itShouldNotTruncateTheStringIfTheStringInLesserThanGivenLength()
+	{
+		$string = "Im little";
+		$truncated = Fishy_StringHelper::truncate($string, 30);
+		
+		$this->spec($truncated)->should->be("Im little");
+	}
+	
+	public function itShouldAcceptACustomPaddingStringWhenTruncating()
+	{
+		$string = "My string is getting to long for the text where I want to use it.";
+		$truncated = Fishy_StringHelper::truncate($string, 30, false, "--");
+		
+		$this->spec($truncated)->should->be("My string is getting to long--");
+	}
 }

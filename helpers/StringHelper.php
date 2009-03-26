@@ -107,6 +107,47 @@ class Fishy_StringHelper
 		return $out;
 	}
 	
+	/**
+	 * Truncate a string
+	 * 
+	 * @return string The truncated string
+	 * @param object $string The string to be truncated
+	 * @param object $length The max length of string
+	 * @param object $preserve_words[optional] Pass true if you want to preserve the words of string
+	 * @param object $padding[optional] You can use this to change the default padding string
+	 */
+	public static function truncate($string, $length, $preserve_words = false, $padding = "...")
+	{
+		if (strlen($string) <= $length) return $string;
+		
+		$truncated = substr($string, 0, $length - strlen($padding));
+		
+		if ($preserve_words) {
+			while ($string[strlen($truncated)] != ' ') {
+				$truncated = substr($truncated, 0, strlen($truncated) - 1);
+			}
+		}
+		
+		$truncated .= $padding;
+		
+		return $truncated;
+	}
+	
+	/**
+	 * Parse a simple string template with given parameters
+	 * 
+	 * You should use # to define variables, example:
+	 *   Fishy_StringHelper::simple_template("Hello #some, welcome!", array("some" => "World"));
+	 * 
+	 * This sample will output: Hello World, welcome!
+	 * 
+	 * The variables inside template should contains only alphabetic chars, any other char will
+	 * stop the variable name parsing.
+	 * 
+	 * @return string
+	 * @param string $template The string containing the template to be parsed
+	 * @param array $vars The parameters to include into template
+	 */
 	public static function simple_template($template, $vars)
 	{
 		$output = "";
