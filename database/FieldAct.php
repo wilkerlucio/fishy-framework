@@ -29,25 +29,63 @@ class FieldAct
 		self::$upload_base_dir = $path;
 	}
 	
-	private static function _set_file($object, $field, $value)
+	/**
+	 * Automatic upload file for a field
+	 *
+	 * Example:
+	 *   $this->field_as_file("my_file_field", array("public" => true));
+	 *
+	 * Properties:
+	 * - public: determine if the file will be uploaded into a public location, setting
+	 *           this property to true you can easly access the uploaded file by
+	 *           getting the public url, but your files will be unprotected, use this
+	 *           option when you are not dealing with private files
+	 */
+	private static function _set_file($object, $field, $value, $configuration = array())
 	{
-		if(!$value['tmp_name']) {
+		$configuration = array_merge(array(
+			"public" => false
+		), $configuration);
+		
+		if (!$value['tmp_name']) {
 			return $object->$field;
 		}
 		
-		$dir = self::$upload_base_dir;
-		$new_path = $dir . self::create_uniq_path($dir, $value['name']);
+		$dir = $configuration["public"] ? FISHY_PUBLIC_PATH . '/uploads/' : self::$upload_base_dir;
+		$rel_path = self::create_uniq_path($dir, $value['name']);
+		$new_path = $dir . $rel_path;
 		
 		move_uploaded_file($value['tmp_name'], $new_path);
 		
 		//remove previous file
-		if (is_file($object->$field)) {
-			unlink($object->$field);
+		$old_path = $object->$field;
+		if ($configuration["public"]) $old_path = FISHY_PUBLIC_PATH . '/' . $old_path;
+		
+		if (is_file($old_path)) {
+			unlink($old_path);
 		}
 		
-		return $new_path;
+		return $configuration["public"] ? 'uploads/' . $rel_path : $new_path;
 	}
 	
+	/**
+	 * Configure a field to accept one image file and automatic resize
+	 *
+	 * In the parameters you should pass one hash containing the name of resize (the key of hash)
+	 * and the resize configuration (the value)
+	 *
+	 * Resize configuration:
+	 * Its just a simple string following "WIDTHxHEIGHTxMODE", where:
+	 *  - WIDTH: the width of resized image
+	 *  - HEIGHT: the height of resized image
+	 *  - MODE: the resize mode, see Fishy_Image library for a full description about
+	 *          resize modes
+	 * You can pass zero (0) for width OR height, this way the library will calculate the proportional
+	 * size.
+	 *
+	 * Example:
+	 *   $this->field_as_image("my_image_field", array("default" => "300x0x0", "thumbnail" => "30x30x1"));
+	 */
 	private static function _set_image($object, $field, $value, $configuration = array())
 	{
 		if(!$value['tmp_name']) {
