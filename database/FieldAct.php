@@ -51,8 +51,10 @@ class FieldAct
 			return $object->$field;
 		}
 		
+		$new_name = self::normalize_filename($value['name']);
+		
 		$dir = $configuration["public"] ? FISHY_PUBLIC_PATH . '/uploads/' : self::$upload_base_dir;
-		$rel_path = self::create_uniq_path($dir, $value['name']);
+		$rel_path = self::create_uniq_path($dir, $new_name);
 		$new_path = $dir . $rel_path;
 		
 		move_uploaded_file($value['tmp_name'], $new_path);
@@ -98,9 +100,11 @@ class FieldAct
 			mkdir($dir);
 		}
 		
-		$rel_path = self::create_uniq_path($dir, pathinfo($value['name'], PATHINFO_FILENAME));
+		$new_name = self::normalize_filename($value['name']);
+		
+		$rel_path = self::create_uniq_path($dir, pathinfo($new_name, PATHINFO_FILENAME));
 		$new_path = $dir . $rel_path;
-		$ext = pathinfo($value['name'], PATHINFO_EXTENSION);
+		$ext = pathinfo($new_name, PATHINFO_EXTENSION);
 		
 		foreach ($configuration as $key => $config) {
 			try {
@@ -239,5 +243,19 @@ class FieldAct
 	private static function work($name, $arguments, $type)
 	{
 		return call_user_func_array(array('self', "_{$type}_" . $name), $arguments);
+	}
+	
+	private static function normalize_filename($name)
+	{
+		$name = str_replace(" ", "-", strtolower($name));
+		$output = '';
+		
+		for ($i = 0; $i < strlen($name); $i++) {
+			if (preg_match("/[a-z0-9.-]/", $name[$i])) {
+				$output .= $name[$i];
+			}
+		}
+		
+		return $output;
 	}
 }
