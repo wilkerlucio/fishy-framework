@@ -24,6 +24,20 @@
 class Fishy_StringHelper
 {
 	/**
+	 * Remove accents from string
+	 *
+	 * @param string $string The string to remove accents
+	 * @return string
+	 */
+	public static function remove_accents($string)
+	{
+		$with_accents    = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
+		$without_accents = 'AAAAAAACEEEEIIIIDNOOOOOOUUUUYbsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
+		
+		return strtr(utf8_decode($string), utf8_decode($with_accents), $without_accents);
+	}
+	
+	/**
 	 * Check if a string starts with another string
 	 *
 	 * @param $haystack The string to search in

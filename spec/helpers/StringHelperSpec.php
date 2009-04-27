@@ -130,4 +130,12 @@ class DescribeStringHelper extends PHPSpec_Context
 		
 		$this->spec($truncated)->should->be("My string is getting to long--");
 	}
+	
+	public function itShouldRemoveAccentsFromStrings()
+	{
+		$string = "É uma string. Não pode ter acentos.";
+		$without_accents = Fishy_StringHelper::remove_accents($string);
+		
+		$this->spec($without_accents)->should->be("E uma string. Nao pode ter acentos.");
+	}
 }
