@@ -62,13 +62,43 @@ abstract class Fishy_Controller
 		return $name;
 	}
 	
+	protected function check_for_haml($path)
+	{
+		$haml_path = $path . ".haml";
+		
+		if (!file_exists($haml_path)) return $path;
+		
+		$new_path = FISHY_CACHE_PATH . "/haml" . substr($path, strlen(FISHY_VIEWS_PATH));
+		
+		if (file_exists($new_path)) {
+			$current = filemtime($haml_path);
+			$old = filemtime($new_path);
+			
+			if ($current <= $old) return $new_path;
+		}
+		
+		require_once FISHY_VENDOR_PATH . "/haml/lib/haml.php";
+		
+		$haml = new Haml();
+		$generated = $haml->parse(file_get_contents($haml_path));
+		
+		Fishy_DirectoryHelper::mkdir($new_path, true);
+		
+		file_put_contents($new_path, $generated);
+		
+		return $new_path;
+	}
+	
 	protected function view_path($action, $controller = null)
 	{
 		if ($controller === null) {
 			$controller = $this->classname();
 		}
 		
-		return self::build_view_path($controller, $action);
+		$path = self::build_view_path($controller, $action);
+		$path = $this->check_for_haml($path);
+		
+		return $path;
 	}
 	
 	/**
@@ -148,6 +178,7 @@ abstract class Fishy_Controller
 		$output = ob_get_clean();
 		
 		$layout = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		$layout = $this->check_for_haml($layout);
 		
 		if (file_exists($layout) && $this->_render_layout) {
 			$content = $output;
@@ -537,5 +568,43 @@ abstract class Fishy_Controller
 		}
 		
 		throw new Exception("Method $method doesn't exists");
+	}
+	
+	/* VIEW HELPERS */
+	
+	protected function image_tag($url, $params = array())
+	{
+		$params = array_merge(array(
+			"src" => $this->public_url("img/" . $url)
+		), $params);
+		
+		$attr = $this->build_tag_attributes($params);
+		$img = "<img{$attr} />";
+		
+		return $img;
+	}
+	
+	protected function link_to($label, $url, $params = array())
+	{
+		$params = array_merge(array(
+			"title" => $label,
+			"href" => $this->url_to($url)
+		), $params);
+		
+		$attr = $this->build_tag_attributes($params);
+		$img = "<a{$attr}>{$label}</a>";
+		
+		return $img;
+	}
+	
+	private function build_tag_attributes($attributes)
+	{
+		$attr = "";
+		
+		foreach ($attributes as $key => $value) {
+			$attr .= " {$key}=\"{$value}\"";
+		}
+		
+		return $attr;
 	}
 }
