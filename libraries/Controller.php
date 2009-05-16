@@ -572,6 +572,25 @@ abstract class Fishy_Controller
 	
 	/* VIEW HELPERS */
 	
+	protected function stylesheet_tag($css, $attr = array())
+	{
+		if (!preg_match('/\.css$/', $css)) {
+			$css .= '.css';
+		}
+		
+		$path = $this->public_url("stylesheets/{$css}");
+		$attr = array_merge(array(
+			"href" => $path,
+			"media" => "screen, projection",
+			"rel" => "stylesheet", 
+			"type" => "text/css"
+		), $attr);
+		
+		$attr = $this->build_tag_attributes($attr);
+		
+		return "<link{$attr} />";
+	}
+	
 	protected function image_tag($url, $params = array())
 	{
 		$params = array_merge(array(
