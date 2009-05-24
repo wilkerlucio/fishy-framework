@@ -578,10 +578,14 @@ abstract class Fishy_Controller
 			$css .= '.css';
 		}
 		
-		$path = $this->public_url("stylesheets/{$css}");
+		$path_sufix = "stylesheets/{$css}";
+		$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
+		$mtime = @filemtime($real_path);
+		
+		$path = $this->public_url("stylesheets/{$css}?{$mtime}");
 		$attr = array_merge(array(
 			"href" => $path,
-			"media" => "screen, projection",
+			"media" => "screen",
 			"rel" => "stylesheet", 
 			"type" => "text/css"
 		), $attr);
@@ -591,10 +595,31 @@ abstract class Fishy_Controller
 		return "<link{$attr} />";
 	}
 	
+	protected function javascript_tag($js, $attr = array())
+	{
+		if (!preg_match('/\.js$/', $js)) {
+			$js .= '.js';
+		}
+		
+		$path_sufix = "javascripts/{$js}";
+		$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
+		$mtime = @filemtime($real_path);
+		
+		$path = $this->public_url("javascripts/{$js}?{$mtime}");
+		$attr = array_merge(array(
+			"src" => $path,
+			"type" => "text/javascript"
+		), $attr);
+		
+		$attr = $this->build_tag_attributes($attr);
+		
+		return "<script{$attr}></script>";
+	}
+	
 	protected function image_tag($url, $params = array())
 	{
 		$params = array_merge(array(
-			"src" => $this->public_url("img/" . $url)
+			"src" => $this->public_url("images/" . $url)
 		), $params);
 		
 		$attr = $this->build_tag_attributes($params);
