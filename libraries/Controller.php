@@ -530,6 +530,16 @@ abstract class Fishy_Controller
 	}
 	
 	/**
+	 * Test if the request method is a POST request
+	 *
+	 * @return boolean true if is a POST request, false otherwise
+	 */
+	protected function post_request()
+	{
+		return $_SERVER['REQUEST_METHOD'] == "POST";
+	}
+	
+	/**
 	 * Get a value at data store
 	 *
 	 * @param $propertie The name o propertie
