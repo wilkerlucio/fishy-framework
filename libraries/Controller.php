@@ -605,6 +605,13 @@ abstract class Fishy_Controller
 		return "<link{$attr} />";
 	}
 	
+	protected function ie_stylesheet_tag($file)
+	{
+		$css = $this->stylesheet_tag($file);
+		
+		return "<!--[if IE]>" . $css . "<![endif]-->";
+	}
+	
 	protected function javascript_tag($js, $attr = array())
 	{
 		if (!preg_match('/\.js$/', $js)) {
