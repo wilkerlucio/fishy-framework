@@ -19,6 +19,13 @@
 define("IMAGE_BIAS_VERTICAL", 1);
 define("IMAGE_BIAS_HORIZONTAL", 2);
 
+define("IMAGE_H_LEFT",    1);
+define("IMAGE_H_CENTER",  2);
+define("IMAGE_H_RIGHT",   4);
+define("IMAGE_V_TOP",     8);
+define("IMAGE_V_CENTER", 16);
+define("IMAGE_V_BOTTOM", 32);
+
 class Fishy_Image {
     /**
      * Presets of extensions to use while converting extensions to default
@@ -41,6 +48,16 @@ class Fishy_Image {
     public function __construct($image) {
         $this->image = $this->load_image($image);
         $this->prepare_data($this->image, true);
+    }
+    
+    /**
+     * Get current working image resource
+     *
+     * @return resource Resource of current image
+     */
+    public function get_image()
+    {
+        return $this->image;
     }
     
     /**
@@ -139,6 +156,51 @@ class Fishy_Image {
         return true;
     }
     
+    public function merge($image, $position = null, $margin = 0)
+    {
+        //adjust position param
+        if ($position === null) $position = IMAGE_H_RIGHT | IMAGE_V_BOTTOM;
+        
+        //check if image is a string (with image path)
+        if (is_string($image)) {
+            $image = new Fishy_Image($image);
+        }
+        
+        //check if image is an Fishy_Image
+        if (is_a($image, 'Fishy_Image')) {
+            $image = $image->get_image();
+        }
+        
+        //calculate margin
+        if (!is_array($margin)) {
+            $margin = array($margin, $margin);
+        }
+        
+        //get image data
+        $data = $this->prepare_data($image);
+        
+        //if is not an array, calculate the position
+        if (!is_array($position)) {
+            $p = $position;
+            $position = array(0, 0);
+            
+            if (($p & IMAGE_H_LEFT) > 0)   $position[0] = 0 + $margin[0];
+            if (($p & IMAGE_H_CENTER) > 0) $position[0] = floor(($this->width / 2) - ($data['width'] / 2));
+            if (($p & IMAGE_H_RIGHT) > 0)  $position[0] = floor($this->width - $data['width']) - $margin[0];
+            
+            if (($p & IMAGE_V_TOP) > 0)    $position[1] = 0 + $margin[1];
+            if (($p & IMAGE_V_CENTER) > 0) $position[1] = floor(($this->height / 2) - ($data['height'] / 2));
+            if (($p & IMAGE_V_BOTTOM) > 0) $position[1] = floor($this->height - $data['height']) - $margin[1];
+        }
+        
+        //ensure alpha blending
+        imagealphablending($this->image, true);
+        imagealphablending($image, true);
+        
+        //do the merge
+        imagecopy($this->image, $image, $position[0], $position[1], 0, 0, $data['width'], $data['height']);
+    }
+    
     /**
      * Output image to browser
      *
@@ -147,8 +209,8 @@ class Fishy_Image {
      * @return void
      */
     public function output($type = IMAGETYPE_JPEG, $include_headers = true) {
-    	$data = $this->bdata($type);
-    	
+        $data = $this->bdata($type);
+        
         if ($include_headers) {
             header('Content-Type: ' . image_type_to_mime_type($type));
             header('Content-Length: ' . strlen($data));
@@ -261,7 +323,7 @@ class Fishy_Image {
         $image = @$fn($path);
         
         if (!$image) {
-        	throw new Fishy_Image_Exception($this, "Error opening image file, probably corrupted data");
+            throw new Fishy_Image_Exception($this, "Error opening image file, probably corrupted data");
         }
         
         return $image;
