@@ -156,6 +156,32 @@ class Fishy_Image {
         return true;
     }
     
+    /**
+     * Merge another image into current image
+     *
+     * This method gets another image and merge with current image,
+     * it can be usefull to insert watermark of our company at image.
+     *
+     * @param string|resource|Fishy_Image $image
+     *   The image to use, you can use an string with the image path, or
+     *   a image resource variable, or another Fishy_Image object
+     * @param integer|array $position
+     *   The position to inject the new image, you can use an array with strict
+     *   positions, like array(10, 20) (x,y), or use the contants:
+     *     IMAGE_H_LEFT, IMAGE_H_CENTER, IMAGE_H_RIGHT
+     *     IMAGE_V_TOP, IMAGE_V_CENTER, IMAGE_V_BOTTOM
+     *   with the constants you may use one for horizontal and one for vertical
+     *   concatenating with bitwise OR operador "|", for example, to put the
+     *   image at bottom left position of image you should use:
+     *     IMAGE_V_BOTTOM | IMAGE_H_CENTER
+     * @param integer|array $margin
+     *   the margin to be applied when you use pre-defined positions at second
+     *   parameter. if you pass one integer, the position will be used equals
+     *   at vertical and horizontal spacements. or you can pass one array to
+     *   specify different margins for vertical and horizontal, examples:
+     *     4 # will put 4 pixels into both
+     *     array(3, 10) # put 3 pixels for horizontal margin, 10 to vertical
+     */
     public function merge($image, $position = null, $margin = 0)
     {
         //adjust position param
