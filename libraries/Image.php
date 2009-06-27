@@ -146,6 +146,9 @@ class Fishy_Image {
             }
         }
         
+        imagealphablending($resized, false);
+        imagesavealpha($resized, true);
+        
         imagecopyresampled($resized, $this->image, $dst_x, $dst_y, $src_x, $src_y, $dst_width, $dst_height, $src_width, $src_height);
         
         imagedestroy($this->image);
@@ -258,6 +261,8 @@ class Fishy_Image {
             throw new Fishy_Image_Exception($this, "File type " . image_type_to_mime_type($info[2]) . " is not supported");
         }
         
+        imagesavealpha($this->image, true);
+        
         ob_start();
         $fn($this->image);
         $data = ob_get_clean();
@@ -289,6 +294,8 @@ class Fishy_Image {
         if ($fn === false) {
             throw new Fishy_Image_Exception($this, "File type " . image_type_to_mime_type($type) . " is not supported");
         }
+        
+        imagesavealpha($this->image, true);
         
         $fn($this->image, $path);
     }
