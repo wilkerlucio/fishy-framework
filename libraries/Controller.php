@@ -29,7 +29,7 @@ abstract class Fishy_Controller
 	protected $_params;
 	protected $_block_cache_stack;
 	
-	public final function __construct()
+	public final function __construct($route = null)
 	{
 		$this->_data = array();
 		$this->_render = true;
@@ -40,6 +40,7 @@ abstract class Fishy_Controller
 		$this->_cycle_it = 0;
 		$this->_params = array_merge($_GET, $_POST);
 		$this->_block_cache_stack = array();
+		$this->_current_route = $route;
 		
 		$this->initialize();
 	}
@@ -141,7 +142,7 @@ abstract class Fishy_Controller
 		$controller_name = Fishy_StringHelper::camelize($route['controller']) . 'Controller';
 		$method = strtolower($route['action']);
 		
-		$controller = new $controller_name();
+		$controller = new $controller_name($route);
 		$controller->_current_route = $route;
 		$controller->_params = array_merge($controller->_params, $route['params']);
 		$controller->execute($method);
