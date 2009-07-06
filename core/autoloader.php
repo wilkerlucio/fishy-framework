@@ -51,21 +51,24 @@ function fishy_autoloader($classname)
 	
 	//check if the class is a controller
 	if (Fishy_StringHelper::ends_with($classname, 'Controller')) {
-		$path = FISHY_CONTROLLERS_PATH;
+		$base_paths = array(FISHY_CONTROLLERS_PATH);
+		Fishy_ArrayHelper::array_push($base_paths, glob(FISHY_SLICES_PATH . "/*/app/controllers"));
 		
-		$bits = explode('_', $classname);
-		
-		while (count($bits) > 1) {
-			$path .= '/' . strtolower(array_shift($bits));
-		}
-		
-		$path .= '/' . substr(array_shift($bits), 0, -strlen('Controller')) . '.php';
-		
-		if (file_exists($path)) {
-			require_once $path;
+		foreach ($base_paths as $path) {
+			$bits = explode('_', $classname);
 			
-			if (class_exists($classname)) {
-				return true;
+			while (count($bits) > 1) {
+				$path .= '/' . strtolower(array_shift($bits));
+			}
+			
+			$path .= '/' . substr(array_shift($bits), 0, -strlen('Controller')) . '.php';
+			
+			if (file_exists($path)) {
+				require_once $path;
+				
+				if (class_exists($classname)) {
+					return true;
+				}
 			}
 		}
 	}
@@ -92,13 +95,18 @@ function fishy_autoloader($classname)
 	}
 	
 	//try to load model
-	$path = FISHY_MODELS_PATH . '/' . $classname . '.php';
+	$base_paths = array(FISHY_MODELS_PATH);
+	Fishy_ArrayHelper::array_push($base_paths, glob(FISHY_SLICES_PATH . "/*/app/models"));
 	
-	if (file_exists($path)) {
-		require_once $path;
+	foreach ($base_paths as $path) {
+		$path = $path . '/' . $classname . '.php';
 		
-		if (class_exists($classname)) {
-			return true;
+		if (file_exists($path)) {
+			require_once $path;
+			
+			if (class_exists($classname)) {
+				return true;
+			}
 		}
 	}
 	

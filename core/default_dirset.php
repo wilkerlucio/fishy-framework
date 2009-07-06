@@ -26,6 +26,7 @@ define('FISHY_PUBLIC_PATH', FISHY_ROOT_PATH . '/public');
 define('FISHY_TMP_PATH', FISHY_ROOT_PATH . '/tmp');
 define('FISHY_UPLOAD_PATH', FISHY_ROOT_PATH . '/upload');
 define('FISHY_VENDOR_PATH', FISHY_ROOT_PATH . '/vendor');
+define('FISHY_SLICES_PATH', FISHY_ROOT_PATH . '/slices');
 
 define('FISHY_CONTROLLERS_PATH', FISHY_APP_PATH . '/controllers');
 define('FISHY_HELPERS_PATH', FISHY_APP_PATH . '/helpers');

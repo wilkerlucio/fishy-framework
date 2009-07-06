@@ -49,7 +49,12 @@ abstract class Fishy_Controller
 	
 	public static function build_view_path($controller, $action)
 	{
-		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
+		$sufix = '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
+		
+		$files = glob(FISHY_SLICES_PATH . '/*/app/views' . $sufix);
+		$files[] = FISHY_VIEWS_PATH . $sufix;
+		
+		return $files[0];
 	}
 	
 	protected function classname($lowercase = true)
@@ -178,7 +183,10 @@ abstract class Fishy_Controller
 		
 		$output = ob_get_clean();
 		
-		$layout = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		$layouts = glob(FISHY_SLICES_PATH . "/*/app/views/layouts/" . $options['layout'] . '.php');
+		$layouts[] = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		
+		$layout = $layouts[0];
 		$layout = $this->check_for_haml($layout);
 		
 		if (file_exists($layout) && $this->_render_layout) {

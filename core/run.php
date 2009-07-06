@@ -32,6 +32,12 @@ $current_uri = Fishy_Uri::get_querystring();
 $router_conf = require_once FISHY_CONFIG_PATH . '/router.php';
 
 $ROUTER = new UserRouter();
+
+//load slice routes
+foreach (glob(FISHY_SLICES_PATH . "/*/config/router.php") as $router) {
+	include_once $router;
+}
+
 $current_route = $ROUTER->match($current_uri);
 
 //load configuration basics
