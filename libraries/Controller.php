@@ -315,7 +315,7 @@ abstract class Fishy_Controller
 	 */
 	protected function public_url($sulfix = '')
 	{
-		return $this->base_url('public/' . $sulfix);
+		return $this->base_url($sulfix);
 	}
 	
 	/**
