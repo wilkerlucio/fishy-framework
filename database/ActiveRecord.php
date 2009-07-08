@@ -670,7 +670,7 @@ abstract class ActiveRecord
 		}
 	}
 	
-	private function fields()
+	public function fields()
 	{
 		$descriptor = TableDescriptor::get_instance();
 		$table = $this->table();
