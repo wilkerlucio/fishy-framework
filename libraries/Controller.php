@@ -477,6 +477,19 @@ abstract class Fishy_Controller
 		
 		$route = "";
 		
+		if (is_string($params) && preg_match("/^@([a-z][a-z0-9_]*)(?:\/([a-z][a-z0-9_]*))?/i", $params, $matches)) {
+			$p = array();
+			
+			if (isset($matches[2])) {
+				$p['controller'] = $matches[1];
+				$p['action'] = $matches[2];
+			} else {
+				$p['action'] = $matches[1];
+			}
+			
+			$params = $p;
+		}
+		
 		if (is_array($params)) {
 			$params = array_merge(array("controller" => $this->classname()), $params);
 			
