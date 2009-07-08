@@ -607,14 +607,14 @@ abstract class ActiveRecord
 		if ($this->exists()) {
 			$this->before_update();
 			$this->validate_ex();
-			$this->update();
 			$this->save_relations();
+			$this->update();
 			$this->after_update();
 		} else {
 			$this->before_create();
 			$this->validate_ex();
-			$this->create();
 			$this->save_relations();
+			$this->create();
 			$this->after_create();
 		}
 		

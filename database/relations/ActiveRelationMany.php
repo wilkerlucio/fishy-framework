@@ -51,7 +51,18 @@ class ActiveRelationMany extends ActiveRelation
 		} else {
 			$local_field = $this->get_foreign_field($this->local_model);
 			
-			$data = $this->foreign_model->all(array('conditions' => array($local_field => $this->local_model->primary_key_value())));
+			if (isset($this->options['as'])) {
+				$as = $this->options['as'];
+				
+				$conditions = array(
+					"{$as}_id" => $this->local_model->primary_key_value(),
+					"{$as}_type" => get_class($this->local_model)
+				);
+			} else {
+				$conditions = array($local_field => $this->local_model->primary_key_value());
+			}
+			
+			$data = $this->foreign_model->all(array('conditions' => $conditions));
 		}
 		
 		return $data;

@@ -28,18 +28,37 @@ class ActiveRelationOne extends ActiveRelation
 {
     public function refresh()
     {
-        $foreign_field = $this->get_foreign_field($this->foreign_model);
-        $foreign_key_field = $this->foreign_model->primary_key();
-        
-        $data = $this->foreign_model->find($this->local_model->$foreign_field);
-        
-        return $data;
+        if (isset($this->options['polymorphic']) && $this->options['polymorphic'] == true) {
+        	$as = $this->foreign_model;
+        	$id_field = $as . "_id";
+        	$type_field = $as . "_type";
+        	
+        	$value = $this->local_model->$id_field;
+        	
+        	return ActiveRecord::model($this->local_model->$type_field)->find($value);
+        } else {
+	        $foreign_field = $this->get_foreign_field($this->foreign_model);
+	        $foreign_key_field = $this->foreign_model->primary_key();
+	        
+	        $data = $this->foreign_model->find($this->local_model->$foreign_field);
+	        
+	        return $data;
+        }
     }
     
     public function push($data)
     {
+  		if (isset($this->options['polymorphic']) && $this->options['polymorphic'] == true) {
+      	$as = $this->foreign_model;
+      	$id_field = $as . "_id";
+      	$type_field = $as . "_type";
+      	
+      	$this->local_model->$id_field = $data->primary_key_value();
+      	$this->local_model->$type_field = get_class($data);
+      } else {
         $foreign_field = $this->get_foreign_field($this->foreign_model);
         
         $this->local_model->$foreign_field = $data->primary_key_value();
+      }
     }
 } // END class ActiveRelationOne extends ActiveRelation
