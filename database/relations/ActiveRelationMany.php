@@ -26,6 +26,11 @@ require_once(dirname(__FILE__) . '/ActiveRelation.php');
  */
 class ActiveRelationMany extends ActiveRelation
 {
+	public function is_many_many()
+	{
+		return isset($this->options['through']);
+	}
+	
 	public function refresh()
 	{
 		if (isset($this->options['through'])) {
