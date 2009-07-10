@@ -293,6 +293,10 @@ abstract class Fishy_Controller
 	 */
 	protected final function base_url($sulfix = '')
 	{
+		if (preg_match("/^([a-z]+):\/\//", $sulfix)) {
+			return $sulfix;
+		}
+		
 		return FISHY_BASE_URL . $sulfix;
 	}
 	
@@ -657,8 +661,10 @@ abstract class Fishy_Controller
 	
 	protected function image_tag($url, $params = array())
 	{
+		$url = preg_match("/^[a-z]+:\/\//", $url) ? $url : $this->public_url("images/" . $url);
+		
 		$params = array_merge(array(
-			"src" => $this->public_url("images/" . $url)
+				"src" => $url
 		), $params);
 		
 		$attr = $this->build_tag_attributes($params);
