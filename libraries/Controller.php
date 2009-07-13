@@ -619,11 +619,15 @@ abstract class Fishy_Controller
 			$js .= '.js';
 		}
 		
-		$path_sufix = "javascripts/{$js}";
-		$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
-		$mtime = @filemtime($real_path);
+		if (preg_match("/^[a-z]+:\/\//", $js)) {
+			$path = $js;
+		} else {
+			$path_sufix = "javascripts/{$js}";
+			$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
+			$mtime = @filemtime($real_path);
+			$path = $this->public_url("javascripts/{$js}?{$mtime}");
+		}
 		
-		$path = $this->public_url("javascripts/{$js}?{$mtime}");
 		$attr = array_merge(array(
 			"src" => $path,
 			"type" => "text/javascript"
