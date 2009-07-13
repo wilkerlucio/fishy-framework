@@ -607,14 +607,14 @@ abstract class ActiveRecord
 		if ($this->exists()) {
 			$this->before_update();
 			$this->validate_ex();
-			$this->update();
 			$this->save_relations();
+			$this->update();
 			$this->after_update();
 		} else {
 			$this->before_create();
 			$this->validate_ex();
-			$this->create();
 			$this->save_relations();
+			$this->create();
 			$this->after_create();
 		}
 		
@@ -670,7 +670,7 @@ abstract class ActiveRecord
 		}
 	}
 	
-	private function fields()
+	public function fields()
 	{
 		$descriptor = TableDescriptor::get_instance();
 		$table = $this->table();
@@ -982,6 +982,22 @@ abstract class ActiveRecord
 	}
 	
 	/**
+	 * Get a description of all of model relations
+	 *
+	 * @return array
+	 */
+	public function describe_relations()
+	{
+		$relations = array();
+		
+		foreach ($this->_relations as $key => $rel) {
+			$relations[] = $this->describe_relation($key);
+		}
+		
+		return $relations;
+	}
+	
+	/**
 	 * Get the definition of a relation
 	 *
 	 * @param string $rel The name of relation to check
@@ -996,6 +1012,8 @@ abstract class ActiveRecord
 		$r = $this->_relations[$rel];
 		
 		return array(
+			'name' => $rel,
+			'instance' => $r,
 			'kind' => get_class($r),
 			'model' => $r->get_foreign_model(),
 			'loaded' => $r->is_loaded()

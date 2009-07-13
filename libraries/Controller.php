@@ -49,7 +49,12 @@ abstract class Fishy_Controller
 	
 	public static function build_view_path($controller, $action)
 	{
-		return FISHY_VIEWS_PATH . '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
+		$sufix = '/' . str_replace('_', '/', strtolower($controller)) . '/' . $action . '.php';
+		
+		$files = glob(FISHY_SLICES_PATH . '/*/app/views' . $sufix);
+		$files[] = FISHY_VIEWS_PATH . $sufix;
+		
+		return $files[0];
 	}
 	
 	protected function classname($lowercase = true)
@@ -178,7 +183,10 @@ abstract class Fishy_Controller
 		
 		$output = ob_get_clean();
 		
-		$layout = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		$layouts = glob(FISHY_SLICES_PATH . "/*/app/views/layouts/" . $options['layout'] . '.php');
+		$layouts[] = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		
+		$layout = $layouts[0];
 		$layout = $this->check_for_haml($layout);
 		
 		if (file_exists($layout) && $this->_render_layout) {
@@ -285,6 +293,10 @@ abstract class Fishy_Controller
 	 */
 	protected final function base_url($sulfix = '')
 	{
+		if (preg_match("/^([a-z]+):\/\//", $sulfix)) {
+			return $sulfix;
+		}
+		
 		return FISHY_BASE_URL . $sulfix;
 	}
 	
@@ -307,7 +319,7 @@ abstract class Fishy_Controller
 	 */
 	protected function public_url($sulfix = '')
 	{
-		return $this->base_url('public/' . $sulfix);
+		return $this->base_url($sulfix);
 	}
 	
 	/**
@@ -468,6 +480,19 @@ abstract class Fishy_Controller
 		global $ROUTER;
 		
 		$route = "";
+		
+		if (is_string($params) && preg_match("/^@([a-z][a-z0-9_]*)(?:\/([a-z][a-z0-9_]*))?/i", $params, $matches)) {
+			$p = array();
+			
+			if (isset($matches[2])) {
+				$p['controller'] = $matches[1];
+				$p['action'] = $matches[2];
+			} else {
+				$p['action'] = $matches[1];
+			}
+			
+			$params = $p;
+		}
 		
 		if (is_array($params)) {
 			$params = array_merge(array("controller" => $this->classname()), $params);
@@ -640,8 +665,10 @@ abstract class Fishy_Controller
 	
 	protected function image_tag($url, $params = array())
 	{
+		$url = preg_match("/^[a-z]+:\/\//", $url) ? $url : $this->public_url("images/" . $url);
+		
 		$params = array_merge(array(
-			"src" => $this->public_url("images/" . $url)
+				"src" => $url
 		), $params);
 		
 		$attr = $this->build_tag_attributes($params);

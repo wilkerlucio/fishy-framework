@@ -38,7 +38,7 @@ abstract class ActiveRelation
     public function __construct($local_model, $foreign_model, $options = array())
     {
         $this->local_model = $local_model;
-        $this->foreign_model = ActiveRecord::model($foreign_model);
+        $this->foreign_model = class_exists($foreign_model) ? ActiveRecord::model($foreign_model) : $foreign_model;
         $this->options = $options;
         
         $this->_data = null;

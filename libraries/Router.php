@@ -135,9 +135,10 @@ class Fishy_Router
 	 *
 	 * @param string $pattern The pattern of rule
 	 * @param array $options Options of rule definition
+	 * @param boolean $top if true, the route is added with highest priority
 	 * @return void
 	 */
-	public function map_connect($pattern, $options = array())
+	public function map_connect($pattern, $options = array(), $top = false)
 	{
 		$options = array_merge($this->default_options(), $options);
 		
@@ -150,7 +151,11 @@ class Fishy_Router
 		$route['name'] = $options['name'];
 		$route['options'] = $options;
 		
-		$this->routes[] = $route;
+		if ($top) {
+			array_unshift($this->routes, $route);
+		} else {
+			$this->routes[] = $route;
+		}
 	}
 	
 	/**
@@ -342,9 +347,15 @@ class Fishy_Router
 				$options = array();
 			}
 			
+			if (count($args) > 2) {
+				$top = $args[2];
+			} else {
+				$top = false;
+			}
+			
 			$options['name'] = $name;
 			
-			return $this->map_connect($pattern, $options);
+			return $this->map_connect($pattern, $options, $top);
 		}
 		
 		throw new Exception('Method not found');
