@@ -136,6 +136,23 @@ class Fishy_FormHelper
 		return self::hidden_field($field, array(), array('value' => '0', 'id' => $fieldid . '_')) . self::text_field($field, $options, $html_options);
 	}
 	
+	public function radio_field($field, $value, $options = array(), $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
+		
+		$attr = array('type' => 'radio', 'value' => $value, 'id' => "{$field}_{$value}_field");
+		
+		if ($object->$normal == $value) {
+			$attr["checked"] = "checked";
+		}
+		
+		$html_options = array_merge($attr, $html_options);
+		
+		return self::text_field($field, $options, $html_options);
+	}
+	
 	public static function relational_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
