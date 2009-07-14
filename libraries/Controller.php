@@ -512,7 +512,7 @@ abstract class Fishy_Controller
 			$route = $params;
 		}
 		
-		if (!preg_match("/^http:\/\//", $route)) {
+		if (!preg_match("/^[a-z]+:\/\//", $route)) {
 			$route = FISHY_BASE_URL . FISHY_INDEX_PAGE . $route;
 		}
 		
