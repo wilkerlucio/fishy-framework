@@ -22,11 +22,20 @@ define('FISHY_SYSTEM_CLASS_PREFIX', 'Fishy_');
 //load core exceptions
 require_once FISHY_SYSTEM_CORE_PATH . '/core_exceptions.php';
 
+//some simple usefull helpers functions
+require_once FISHY_SYSTEM_CORE_PATH . '/core_helpers.php';
+
 //autoloader for classes
 include_once FISHY_SYSTEM_CORE_PATH . '/autoloader.php';
 
 //load uri
 $current_uri = Fishy_Uri::get_querystring();
+
+//load configuration basics
+$conf = include FISHY_CONFIG_PATH . '/config.php';
+
+define('FISHY_BASE_URL', $conf->base_url);
+define('FISHY_INDEX_PAGE', $conf->index_page);
 
 //load router configuration
 $router_conf = require_once FISHY_CONFIG_PATH . '/router.php';
@@ -38,16 +47,11 @@ foreach (glob(FISHY_SLICES_PATH . "/*/config/router.php") as $router) {
 	include_once $router;
 }
 
-$current_route = $ROUTER->match($current_uri);
-
-//load configuration basics
-$conf = include FISHY_CONFIG_PATH . '/config.php';
-
-define('FISHY_BASE_URL', $conf->base_url);
-define('FISHY_INDEX_PAGE', $conf->index_page);
-
-//some simple usefull helpers functions
-require_once FISHY_SYSTEM_CORE_PATH . '/core_helpers.php';
+try {
+	$current_route = $ROUTER->match($current_uri);
+} catch (Fishy_RouterException $e) {
+	dispatch_error($e, 404);
+}
 
 //disable magic quotes
 include_once FISHY_SYSTEM_CORE_PATH . '/magic_quotes.php';
@@ -64,4 +68,8 @@ FieldAct::set_upload_path(FISHY_UPLOAD_PATH . '/');
 DBCommand::configure($db_conf->host, $db_conf->user, $db_conf->password, $db_conf->database);
 
 //run!
-Fishy_Controller::run($current_route);
+try {
+	Fishy_Controller::run($current_route);
+} catch (Exception $e) {
+	dispatch_error($e);
+}

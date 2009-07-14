@@ -119,7 +119,7 @@ abstract class Fishy_Controller
 		$view_path = $this->view_path($method);
 		
 		if (!method_exists($this, $method) && !file_exists($view_path)) {
-			throw new Exception("Not found $method in " . $this->classname());
+			dispatch_error(new Exception("Not found $method in " . $this->classname()), 404);
 		}
 		
 		if (method_exists($this, $method)) {
@@ -146,6 +146,10 @@ abstract class Fishy_Controller
 	public static function run($route) {
 		$controller_name = Fishy_StringHelper::camelize($route['controller']) . 'Controller';
 		$method = strtolower($route['action']);
+		
+		if (!class_exists($controller_name)) {
+			dispatch_error(new Exception("Controller {$controller_name} doesn't exists"), 404);
+		}
 		
 		$controller = new $controller_name($route);
 		$controller->_current_route = $route;
