@@ -125,4 +125,29 @@ class Fishy_ArrayHelper
 		
 		return $groups;
 	}
+	
+	public static function delete(&$array, $element)
+	{
+		$return = null;
+		
+		foreach ($array as $key => $value) {
+			if ($value == $element) {
+				$return = $value;
+				unset($array[$key]);
+			}
+		}
+		
+		return $return;
+	}
+	
+	public static function delete_at(&$array, $index)
+	{
+		if (isset($array[$index])) {
+			$value = $array[$index];
+			unset($array[$index]);
+			return $value;
+		} else {
+			return null;
+		}
+	}
 }
