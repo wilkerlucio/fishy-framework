@@ -67,6 +67,11 @@ $db_conf = include FISHY_CONFIG_PATH . '/db.php';
 FieldAct::set_upload_path(FISHY_UPLOAD_PATH . '/');
 DBCommand::configure($db_conf->host, $db_conf->user, $db_conf->password, $db_conf->database);
 
+//if your submodules needs to do something, this is the time!
+foreach (glob(FISHY_SLICES_PATH . "/*/config/setup.php") as $setup) {
+	include_once $setup;
+}
+
 //run!
 try {
 	Fishy_Controller::run($current_route);
