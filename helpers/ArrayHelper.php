@@ -150,4 +150,16 @@ class Fishy_ArrayHelper
 			return null;
 		}
 	}
+	
+	public static function group_by($array, $grouper)
+	{
+		$groups = array();
+		
+		foreach ($array as $item) {
+			$key = call_user_func($grouper, $item);
+			$groups[$key][] = $item;
+		}
+		
+		return $groups;
+	}
 }
