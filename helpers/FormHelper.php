@@ -136,7 +136,7 @@ class Fishy_FormHelper
 		return self::hidden_field($field, array(), array('value' => '0', 'id' => $fieldid . '_')) . self::text_field($field, $options, $html_options);
 	}
 	
-	public function radio_field($field, $value, $options = array(), $html_options = array())
+	public static function radio_field($field, $value, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
 		$fieldid = self::get_field_id($field);
