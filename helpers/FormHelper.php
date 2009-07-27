@@ -222,7 +222,7 @@ class Fishy_FormHelper
 		}
 		
 		$html_options = array_merge(array(
-    		'name' => $fieldname,
+    		'name' => $fieldname . '[]',
     		'class' => '',
     		'type' => 'checkbox'
 		), $html_options);
