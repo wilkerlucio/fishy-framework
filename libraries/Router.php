@@ -189,7 +189,7 @@ class Fishy_Router
 				if ($char == '_' || ($code > 96 && $code < 123)) {
 					$var_buffer .= $char;
 				} else {
-					$match_pattern .= '([a-z0-9_-]+?)';
+					$match_pattern .= '([\sa-z0-9_-]+?)';
 					$match_pattern .= $this->escape_pattern_char($char);
 					$state = 0;
 					$names[] = $var_buffer;
@@ -201,7 +201,7 @@ class Fishy_Router
 		}
 		
 		if ($state == 1) {
-			$match_pattern .= '([a-z0-9_-]+?)';
+			$match_pattern .= '([\sa-z0-9_-]+?)';
 			$names[] = $var_buffer;
 		}
 		
