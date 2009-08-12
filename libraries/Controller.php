@@ -42,6 +42,11 @@ abstract class Fishy_Controller
 		$this->_block_cache_stack = array();
 		$this->_current_route = $route;
 		
+		//load helpers
+		foreach (glob(FISHY_HELPERS_PATH . "/*.php") as $helper) {
+			require_once $helper;
+		}
+		
 		$this->initialize();
 	}
 	
@@ -144,6 +149,8 @@ abstract class Fishy_Controller
 	 * @return void
 	 */
 	public static function run($route) {
+		global $CONTROLLER;
+		
 		$controller_name = Fishy_StringHelper::camelize($route['controller']) . 'Controller';
 		$method = strtolower($route['action']);
 		
@@ -154,6 +161,9 @@ abstract class Fishy_Controller
 		$controller = new $controller_name($route);
 		$controller->_current_route = $route;
 		$controller->_params = array_merge($controller->_params, $route['params']);
+		
+		$CONTROLLER = $controller;
+		
 		$controller->execute($method);
 	}
 	
@@ -283,7 +293,7 @@ abstract class Fishy_Controller
 	 * @param $path The path to be redirected, this path works like if you are using site_url() method
 	 * @return void
 	 */
-	protected function redirect_to($path)
+	public function redirect_to($path)
 	{
 		header('Location: ' . $this->url_to($path));
 		exit;
@@ -295,7 +305,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	protected final function base_url($sulfix = '')
+	public final function base_url($sulfix = '')
 	{
 		if (preg_match("/^([a-z]+):\/\//", $sulfix)) {
 			return $sulfix;
@@ -310,7 +320,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	protected function site_url($sulfix = '')
+	public function site_url($sulfix = '')
 	{
 		return $this->base_url(FISHY_INDEX_PAGE . $sulfix);
 	}
@@ -321,7 +331,7 @@ abstract class Fishy_Controller
 	 * @param $sulfix Sulfix to be append at end of file
 	 * @return string The final path
 	 */
-	protected function public_url($sulfix = '')
+	public function public_url($sulfix = '')
 	{
 		return $this->base_url($sulfix);
 	}
@@ -341,14 +351,14 @@ abstract class Fishy_Controller
 	/**
 	 * 
 	 */
-	protected function cache_block($identifier)
+	public function cache_block($identifier)
 	{
 		$this->_block_cache_stack[] = $identifier;
 		
 		ob_start();
 	}
 	
-	protected function cache_block_end()
+	public function cache_block_end()
 	{
 		$block_content = ob_get_clean();
 		$identifier = array_pop($this->_block_cache_stack);
@@ -385,7 +395,7 @@ abstract class Fishy_Controller
 	 * @param mixed $default The default value
 	 * @return mixed
 	 */
-	protected function gp($propertie, $default = null)
+	public function gp($propertie, $default = null)
 	{
 		return isset($_GET[$propertie]) ? $_GET[$propertie] : $default;
 	}
@@ -397,7 +407,7 @@ abstract class Fishy_Controller
 	 * @param mixed $default The default value
 	 * @return mixed
 	 */
-	protected function pp($propertie, $default = null)
+	public function pp($propertie, $default = null)
 	{
 		return isset($_POST[$propertie]) ? $_POST[$propertie] : $default;
 	}
@@ -409,12 +419,12 @@ abstract class Fishy_Controller
 	 * @param mixed $default The default value
 	 * @return mixed
 	 */
-	protected function sp($propertie, $default = null)
+	public function sp($propertie, $default = null)
 	{
 		return isset($_SESSION[$propertie]) ? $_SESSION[$propertie] : $default;
 	}
 	
-	protected function cycle()
+	public function cycle()
 	{
 		$args = func_get_args();
 		
@@ -432,7 +442,7 @@ abstract class Fishy_Controller
 		return $this->_cycle[$this->_cycle_it];
 	}
 	
-	protected function image_cache($model, $field, $id = null, $configuration = array(), $user_vars = array())
+	public function image_cache($model, $field, $id = null, $configuration = array(), $user_vars = array())
 	{
 		$configuration = array_merge(array(
 			'width' => 100,
@@ -479,7 +489,7 @@ abstract class Fishy_Controller
 		return file_get_contents($path);
 	}
 	
-	protected function url_to($params)
+	public function url_to($params)
 	{
 		global $ROUTER;
 		
@@ -530,7 +540,7 @@ abstract class Fishy_Controller
 	 * @param mixed $default The default value
 	 * @return mixed
 	 */
-	protected function param($name, $default = null)
+	public function param($name, $default = null)
 	{
 		return isset($this->_params[$name]) ? $this->_params[$name] : $default;
 	}
@@ -544,7 +554,7 @@ abstract class Fishy_Controller
 	 * @param string $message Message to display for client
 	 * @param mixed $redirect_to String or Array with path to use in redirect
 	 */
-	protected function show_message_and_redirect_to($message, $redirect_to)
+	public function show_message_and_redirect_to($message, $redirect_to)
 	{
 		$message = preg_replace('/(\r\n|\r|\n)/', '\\n', $message);
 		
@@ -564,7 +574,7 @@ abstract class Fishy_Controller
 	 *
 	 * @return boolean true if is a POST request, false otherwise
 	 */
-	protected function post_request()
+	public function post_request()
 	{
 		return $_SERVER['REQUEST_METHOD'] == "POST";
 	}
@@ -576,22 +586,22 @@ abstract class Fishy_Controller
 	 * @param $default The default value (if propertie doesn't exists)
 	 * @return mixed
 	 */
-	protected function get($propertie, $default = null)
+	public function get($propertie, $default = null)
 	{
 		return isset($this->_data[$propertie]) ? $this->_data[$propertie] : $default;
 	}
 	
-	protected function __get($propertie)
+	public function __get($propertie)
 	{
 		return $this->get($propertie);
 	}
 	
-	protected function __set($propertie, $value)
+	public function __set($propertie, $value)
 	{
 		$this->_data[$propertie] = $value;
 	}
 	
-	protected function __call($method, $args)
+	public function __call($method, $args)
 	{
 		global $ROUTER;
 		
@@ -612,7 +622,7 @@ abstract class Fishy_Controller
 	
 	/* VIEW HELPERS */
 	
-	protected function stylesheet_tag($css, $attr = array())
+	public function stylesheet_tag($css, $attr = array())
 	{
 		if (!preg_match('/\.css$/', $css)) {
 			$css .= '.css';
@@ -635,14 +645,14 @@ abstract class Fishy_Controller
 		return "<link{$attr} />";
 	}
 	
-	protected function ie_stylesheet_tag($file)
+	public function ie_stylesheet_tag($file)
 	{
 		$css = $this->stylesheet_tag($file);
 		
 		return "<!--[if IE]>" . $css . "<![endif]-->";
 	}
 	
-	protected function javascript_tag($js, $attr = array())
+	public function javascript_tag($js, $attr = array())
 	{
 		if (!preg_match('/\.js$/', $js)) {
 			$js .= '.js';
@@ -667,7 +677,7 @@ abstract class Fishy_Controller
 		return "<script{$attr}></script>";
 	}
 	
-	protected function image_tag($url, $params = array())
+	public function image_tag($url, $params = array())
 	{
 		$url = preg_match("/^[a-z]+:\/\//", $url) ? $url : $this->public_url("images/" . $url);
 		
@@ -681,7 +691,7 @@ abstract class Fishy_Controller
 		return $img;
 	}
 	
-	protected function link_to($label, $url, $params = array())
+	public function link_to($label, $url, $params = array())
 	{
 		$params = array_merge(array(
 			"title" => $label,
