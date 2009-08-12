@@ -976,6 +976,7 @@ abstract class ActiveRecord
 			$name = $parts[1];
 		} else {
 			$name = $model;
+			$model = ucfirst($model);
 		}
 		
 		return array($model, $name);
