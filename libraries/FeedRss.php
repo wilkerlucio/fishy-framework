@@ -52,6 +52,7 @@ class Fishy_FeedRss
 			if ($entry->permalink) $output->appendln("<link>{$entry->permalink}</link>");
 			if ($entry->author) $output->appendln("<author>{$entry->author}</author>");
 			if ($entry->content) $output->appendln("<description><![CDATA[{$entry->content}]]></description>");
+			if ($entry->updated) $output->appendln("<pubDate>" . $this->convert_date($entry->updated) . "</pubDate>");
 			
 			$output->decrease_indent();
 			$output->appendln('</item>');
@@ -63,5 +64,10 @@ class Fishy_FeedRss
 		$output->appendln('</rss>');
 		
 		return $output->get_data();
+	}
+	
+	private function convert_date($date)
+	{
+		return date("D, d M Y H:i:s -0300", strtotime($date));
 	}
 }
