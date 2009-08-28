@@ -58,10 +58,11 @@ function fishy_autoloader($classname)
 			$bits = explode('_', $classname);
 			
 			while (count($bits) > 1) {
-				$path .= '/' . strtolower(array_shift($bits));
+				$path .= '/' . array_shift($bits);
 			}
 			
 			$path .= '/' . substr(array_shift($bits), 0, -strlen('Controller')) . '.php';
+			$path = strtolower($path);
 			
 			if (file_exists($path)) {
 				require_once $path;
