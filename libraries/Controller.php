@@ -47,6 +47,10 @@ abstract class Fishy_Controller
 			require_once $helper;
 		}
 		
+		foreach (glob(FISHY_SLICES_PATH . "/*/app/helpers/*.php") as $helper) {
+			require_once $helper;
+		}
+		
 		$this->initialize();
 	}
 	
