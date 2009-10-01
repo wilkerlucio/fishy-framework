@@ -66,7 +66,7 @@ class Fishy_FormHelper
 		
 		$object = self::get_object();
 		
-		if (is_a($object, 'BlankObject')) {
+		if (!is_a($object, 'ActiveRecord') || count($object->problems) == 0) {
 			return "";
 		}
 		
