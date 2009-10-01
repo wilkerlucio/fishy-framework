@@ -27,6 +27,8 @@ class Fishy_FormHelper
 	
 	public static function form_for($object, $options = array(), $html_options = array())
 	{
+		global $CONTROLLER;
+		
 		$options = array_merge(array(
 			'multipart' => false,
 			'varname'   => 'data'
@@ -39,7 +41,7 @@ class Fishy_FormHelper
 		$html_options = array_merge(array(
 			'accept-charset' => 'UTF-8',
 			'method' => 'post',
-			'action' => ''
+			'action' => $object->exists() ? $CONTROLLER->url_to(array("action" => "update", "id" => $object->primary_key_value())) : $CONTROLLER->url_to("@create")
 		), $html_options);
 		
 		if ($options['multipart']) {
@@ -56,6 +58,31 @@ class Fishy_FormHelper
 		return '</form>';
 	}
 	
+	public static function error_messages($options = array())
+	{
+		$options = array_merge(array(
+				"id" => "errorExplanation"
+		), $options);
+		
+		$object = self::get_object();
+		
+		if (is_a($object, 'BlankObject')) {
+			return "";
+		}
+		
+		$errors  = '<div class="error-explanation" id="' . $options["id"] . '">';
+		$errors .= '<ul>';
+		
+		foreach ($object->problems() as $problem) {
+			$errors .= "<li>{$problem}</li>";
+		}
+		
+		$errors .= '</ul>';
+		$errors .= '</div>';
+		
+		return $errors;
+	}
+	
 	public static function text_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
@@ -67,15 +94,10 @@ class Fishy_FormHelper
 			'id' => $fieldid,
 			'name' => $fieldname,
 			'value' => $object->$normal,
-			'type' => 'text',
-			'class' => ''
+			'type' => 'text'
 		), $html_options);
 		
-		if (!is_a($object, 'BlankObject') && $object->field_has_errors($field)) {
-			$attributes['class'] .= ' error';
-		}
-		
-		return self::build_tag('input', $attributes);
+		return self::tag_with_errors(self::build_tag('input', $attributes), $object, $normal);
 	}
 	
 	public static function text_area($field, $options = array(), $html_options = array())
@@ -95,7 +117,7 @@ class Fishy_FormHelper
 			$attributes['class'] .= ' error';
 		}
 		
-		return self::build_tag('textarea', $attributes, $object->$normal);
+		return self::tag_with_errors(self::build_tag('textarea', $attributes, $object->$normal), $object, $normal);
 	}
 	
 	public static function password_field($field, $options = array(), $html_options = array())
@@ -223,13 +245,8 @@ class Fishy_FormHelper
 		
 		$html_options = array_merge(array(
     		'name' => $fieldname . '[]',
-    		'class' => '',
     		'type' => 'checkbox'
 		), $html_options);
-		
-		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
-			$html_options['class'] .= ' error';
-		}
 		
 		$out = '';
 		
@@ -244,7 +261,7 @@ class Fishy_FormHelper
 			$out .= sprintf($options['wrap_into'], self::build_tag('input', $attr) . ' ' . self::build_tag('label', array('for' => $id), $name) . ' ');
 		}
 		
-		return $out;
+		return self::tag_with_errors($out, $object, $normal);
 	}
 	
 	public static function select_num_range($start, $end)
@@ -282,13 +299,8 @@ class Fishy_FormHelper
 		
 		$html_options = array_merge(array(
     		'name' => $fieldname,
-    		'id' => $fieldid,
-    		'class' => ''
+    		'id' => $fieldid
 		), $html_options);
-		
-		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
-			$html_options['class'] .= ' error';
-		}
 		
 		$out  = '<select';
 		$out .= self::build_html_attributes($html_options);
@@ -310,7 +322,7 @@ class Fishy_FormHelper
 		
 		$out .= "</select>";
 		
-		return $out;
+		return self::tag_with_errors($out, $object, $normal);
 	}
 	
 	public static function select_for_model($field, $collection, $name_field, $value_field = 'id', $options = array(), $html_options = array())
@@ -455,6 +467,15 @@ class Fishy_FormHelper
 			return "<$tagname $attributes>$content</$tagname>";
 		} else {
 			return "<$tagname $attributes />";
+		}
+	}
+	
+	private static function tag_with_errors($tag, $object, $normal)
+	{
+		if (!is_a($object, 'BlankObject') && $object->field_has_errors($normal)) {
+			return self::build_tag("div", array("class" => "field-with-errors"), $tag);
+		} else {
+			return $tag;
 		}
 	}
 }
