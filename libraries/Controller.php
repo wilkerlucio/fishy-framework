@@ -116,6 +116,11 @@ abstract class Fishy_Controller
 		return $path;
 	}
 	
+	public function get_current_route()
+	{
+		return $this->_current_route;
+	}
+	
 	/**
 	 * Execute main routine of an action
 	 *
