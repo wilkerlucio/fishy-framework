@@ -29,7 +29,7 @@
 
 class Inflect
 {
-    static $plural = array(
+    public static $plural = array(
         '/(quiz)$/i'               => '$1zes',
         '/^(ox)$/i'                => '$1en',
         '/([m|l])ouse$/i'          => '$1ice',
@@ -51,7 +51,7 @@ class Inflect
         '/$/'                      => 's'
     );
 
-    static $singular = array(
+    public static $singular = array(
         '/(quiz)zes$/i'             => '$1',
         '/(matr)ices$/i'            => '$1ix',
         '/(vert|ind)ices$/i'        => '$1ex',
@@ -82,7 +82,7 @@ class Inflect
         '/s$/i'                     => ''
     );
 
-    static $irregular = array(
+    public static $irregular = array(
         'move'   => 'moves',
         'foot'   => 'feet',
         'goose'  => 'geese',
@@ -93,7 +93,7 @@ class Inflect
         'person' => 'people'
     );
 
-    static $uncountable = array(
+    public static $uncountable = array(
         'sheep',
         'fish',
         'deer',

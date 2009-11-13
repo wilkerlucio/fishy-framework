@@ -36,12 +36,17 @@ class ModelCache
         return self::$instance;
     }
     
-    public function __get($model_name)
+    public function get_cached_instance($model_name)
     {
         if (!isset($this->instances[$model_name])) {
             $this->instances[$model_name] = new $model_name();
         }
         
         return $this->instances[$model_name];
+    }
+    
+    public function __get($model_name)
+    {
+        return $this->get_cached_instance($model_name);
     }
 }
