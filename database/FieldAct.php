@@ -84,9 +84,10 @@ class FieldAct
 	 *          resize modes
 	 * You can pass zero (0) for width OR height, this way the library will calculate the proportional
 	 * size.
+	 * You can use null to get a original version of image
 	 *
 	 * Example:
-	 *   $this->field_as_image("my_image_field", array("default" => "300x0x0", "thumbnail" => "30x30x1"));
+	 *   $this->field_as_image("my_image_field", array("default" => "300x0x0", "thumbnail" => "30x30x1", "original" => null));
 	 */
 	private static function _set_image($object, $field, $value, $configuration = array())
 	{
@@ -108,14 +109,20 @@ class FieldAct
 		
 		foreach ($configuration as $key => $config) {
 			try {
-				//get info
-				list($width, $height, $mode) = explode("x", $config);
+				if ($config) {
+					//get info
+					list($width, $height, $mode) = explode("x", $config);
 				
-				//resize
-				$image = new Fishy_Image($value['tmp_name']);
-				$image->resize((int) $width, (int) $height, (int) $mode);
-				$image->save("$new_path.$key.$ext");
-				$image->destroy();
+					//resize
+					$image = new Fishy_Image($value['tmp_name']);
+					$image->resize((int) $width, (int) $height, (int) $mode);
+					$image->save("$new_path.$key.$ext");
+					$image->destroy();
+				} else {
+					$image = new Fishy_Image($value['tmp_name']);
+					$image->save("$new_path.$key.$ext");
+					$image->destroy();
+				}
 				
 				//remove previous file
 				$old_path = $dir . self::parse_image_path($object->$field, $key);
