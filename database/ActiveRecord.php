@@ -1155,6 +1155,18 @@ abstract class ActiveRecord
 	 */
 	public function validate() { return true; }
 	
+	//Conversors
+	
+	public function to_array()
+	{
+		return $this->_attributes;
+	}
+	
+	public function to_json()
+	{
+		return json_encode($this->to_array());
+	}
+	
 	//Named Scopes
 	
 	/**
