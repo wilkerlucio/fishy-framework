@@ -35,7 +35,7 @@ abstract class Fishy_Controller
 		$this->_render = true;
 		$this->_render_layout = true;
 		$this->_page_cache = false;
-		$this->_layout = $this->classname();
+		$this->_layout = null;
 		$this->_cycle = array();
 		$this->_cycle_it = 0;
 		$this->_params = array_merge($_GET, $_POST);
@@ -182,9 +182,46 @@ abstract class Fishy_Controller
 			'return' => false,
 			'controller' => $this->classname(),
 			'as' => null,
-			'layout' => $this->_layout,
+			'layout' => $this->layout_file(),
 			'locals' => array()
 		);
+	}
+	
+	protected function layout_file()
+	{
+		if ($this->_layout) {
+			return $this->_layout;
+		}
+		
+		$layout = $this->classname();
+		$current_class = $this;
+		
+		while (!$this->layout_path($layout)) {
+			$class = new ReflectionClass($current_class);
+			$class = $class->getParentClass();
+			
+			if (!$class) {
+				break;
+			}
+			
+			$class = $class->getName();
+			
+			$current_class = new $class;
+			$layout = $current_class->classname();
+		}
+		
+		return $layout;
+	}
+	
+	protected function layout_path($layout)
+	{
+		$layouts = glob(FISHY_SLICES_PATH . "/*/app/views/layouts/" . $layout . '.php');
+		$layouts[] = FISHY_VIEWS_PATH . '/layouts/' . $layout . '.php';
+		
+		$layout = $layouts[0];
+		$layout = $this->check_for_haml($layout);
+		
+		return file_exists($layout) ? $layout : null;
 	}
 	
 	/**
@@ -206,13 +243,9 @@ abstract class Fishy_Controller
 		
 		$output = ob_get_clean();
 		
-		$layouts = glob(FISHY_SLICES_PATH . "/*/app/views/layouts/" . $options['layout'] . '.php');
-		$layouts[] = FISHY_VIEWS_PATH . '/layouts/' . $options['layout'] . '.php';
+		$layout = $this->layout_path($options['layout']);
 		
-		$layout = $layouts[0];
-		$layout = $this->check_for_haml($layout);
-		
-		if (file_exists($layout) && $this->_render_layout) {
+		if ($layout && $this->_render_layout) {
 			$content = $output;
 			ob_start();
 			include $layout;
@@ -242,6 +275,11 @@ abstract class Fishy_Controller
 		
 		if ($options['as'] === null) {
 			$options['as'] = $partial;
+		}
+		
+		if (preg_match("/^(\w+)\/(\w+)$/", $partial, $matches)) {
+			$partial = $matches[2];
+			$options["controller"] = $matches[1];
 		}
 		
 		ob_start();
@@ -661,29 +699,44 @@ abstract class Fishy_Controller
 		return "<!--[if IE]>" . $css . "<![endif]-->";
 	}
 	
-	public function javascript_tag($js, $attr = array())
+	public function javascript_tag()
 	{
-		if (!preg_match('/\.js$/', $js)) {
-			$js .= '.js';
-		}
+		$args = func_get_args();
+		$last = $args[count($args) - 1];
 		
-		if (preg_match("/^[a-z]+:\/\//", $js)) {
-			$path = $js;
+		if (is_array($last)) {
+			$attr = array_pop($args);
 		} else {
-			$path_sufix = "javascripts/{$js}";
-			$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
-			$mtime = @filemtime($real_path);
-			$path = $this->public_url("javascripts/{$js}?{$mtime}");
+			$attr = array();
 		}
 		
-		$attr = array_merge(array(
-			"src" => $path,
-			"type" => "text/javascript"
-		), $attr);
+		$buffer = "";
 		
-		$attr = $this->build_tag_attributes($attr);
+		foreach ($args as $js) {
+			if (!preg_match('/\.js$/', $js)) {
+				$js .= '.js';
+			}
 		
-		return "<script{$attr}></script>";
+			if (preg_match("/^[a-z]+:\/\//", $js)) {
+				$path = $js;
+			} else {
+				$path_sufix = "javascripts/{$js}";
+				$real_path = FISHY_PUBLIC_PATH . '/' . $path_sufix;
+				$mtime = @filemtime($real_path);
+				$path = $this->public_url("javascripts/{$js}?{$mtime}");
+			}
+			
+			$cur_attr = array_merge(array(
+				"src" => $path,
+				"type" => "text/javascript"
+			), $attr);
+		
+			$cur_attr = $this->build_tag_attributes($cur_attr);
+			
+			$buffer .= "<script{$cur_attr}></script>\r\n";
+		}
+		
+		return $buffer;
 	}
 	
 	public function image_tag($url, $params = array())
