@@ -272,13 +272,13 @@ abstract class Fishy_Controller
 	{
 		$options = array_merge($this->render_options(), $options);
 		
-		if ($options['as'] === null) {
-			$options['as'] = $partial;
-		}
-		
 		if (preg_match("/^(\w+)\/(\w+)$/", $partial, $matches)) {
 			$partial = $matches[2];
 			$options["controller"] = $matches[1];
+		}
+		
+		if ($options['as'] === null) {
+			$options['as'] = $partial;
 		}
 		
 		ob_start();
