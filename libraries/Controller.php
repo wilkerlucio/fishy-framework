@@ -199,12 +199,11 @@ abstract class Fishy_Controller
 		while (!$this->layout_path($layout)) {
 			$class = new ReflectionClass($current_class);
 			$class = $class->getParentClass();
+			$class = $class->getName();
 			
-			if (!$class) {
+			if ($class == 'Fishy_Controller') {
 				break;
 			}
-			
-			$class = $class->getName();
 			
 			$current_class = new $class;
 			$layout = $current_class->classname();
