@@ -61,7 +61,7 @@ class ActiveRecord_Validators
 	 */
 	public static function validates_email_of($object, $field, $err = null)
 	{
-		if (!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $object->$field)) {
+		if (!preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i", $object->$field)) {
 			$object->add_error($field, $err ? $err : sprintf(self::$validations_messages['invalid_email'], $field));
 			return false;
 		}
