@@ -93,7 +93,7 @@ class Fishy_StringHelper
 		return $normalized;
 	}
 	
-	public function underscore()
+	public function underscore($string)
 	{
 		$string = str_replace("\\", "/", $string);
 		$string = preg_replace("/([A-Z]+)([A-Z][a-z])/", '$1_$2', $string);

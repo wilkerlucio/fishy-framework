@@ -29,7 +29,7 @@ class ActiveRelationOne extends ActiveRelation
     public function refresh()
     {
         if (isset($this->options['polymorphic']) && $this->options['polymorphic'] == true) {
-        	$as = $this->foreign_model;
+        	$as = Fishy_StringHelper::underscore($this->foreign_model);
         	$id_field = $as . "_id";
         	$type_field = $as . "_type";
         	
