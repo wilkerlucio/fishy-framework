@@ -83,6 +83,20 @@ class Fishy_FormHelper
 		return $errors;
 	}
 	
+	public function label($field, $label, $html_options = array())
+	{
+		$object = self::get_object();
+		$fieldname = self::get_field($field);
+		$fieldid = self::get_field_id($field);
+		$normal = self::get_normalized_field($field);
+		
+		$attributes = array_merge(array(
+			'for' => $fieldid,
+		), $html_options);
+		
+		return self::build_tag("label", $attributes, $label);
+	}
+	
 	public static function text_field($field, $options = array(), $html_options = array())
 	{
 		$object = self::get_object();
