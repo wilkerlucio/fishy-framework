@@ -140,12 +140,12 @@ class FieldAct
 		return $rel_path . ".*." . $ext;
 	}
 	
-	private static function _call_image($object, $field, $config, $sample = "default")
+	private static function _call_image($object, $field, $config, $sample = "default", $prefix_upload = true)
 	{
 		$base = $object->$field;
 		
 		if ($base) {
-			return self::parse_image_path($base, $sample);
+			return ($prefix_upload ? "../uploads/" : "") . self::parse_image_path($base, $sample);
 		} else {
 			return null;
 		}
