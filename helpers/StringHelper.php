@@ -93,6 +93,16 @@ class Fishy_StringHelper
 		return $normalized;
 	}
 	
+	public function underscore()
+	{
+		$string = str_replace("\\", "/", $string);
+		$string = preg_replace("/([A-Z]+)([A-Z][a-z])/", '$1_$2', $string);
+		$string = preg_replace("/([a-z\d])([A-Z])/", '$1_$2', $string);
+		$string = strtr($string, "-", "_");
+		
+		return strtolower($string);
+	}
+	
 	/**
 	 * Gives a normalized string that can be used at urls
 	 *
